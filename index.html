@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>產業分析：外部環境與產業結構</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'], serif: ['Merriweather','serif'] } } }
+}
+</script>
+<style>
+@keyframes fadeInUp { from{opacity:0;transform:translateY(15px)} to{opacity:1;transform:translateY(0)} }
+.animate-fade-in { animation: fadeInUp 0.5s ease-out forwards; }
+.perspective { perspective: 1000px; }
+.transform-style-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.rotate-y-180 { transform: rotateY(180deg); }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+.dark ::-webkit-scrollbar-thumb { background: #475569; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+/* ===== SVG Icons ===== */
+const IconBookOpen = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>;
+const IconAlertTriangle = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>;
+const IconCheckCircle = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>;
+const IconGlobe = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>;
+const IconChevronRight = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="9 18 15 12 9 6"/></svg>;
+const IconChevronUp = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="18 15 12 9 6 15"/></svg>;
+const IconMenu = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>;
+const IconX = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
+const IconMoon = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>;
+const IconSun = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>;
+const IconPlay = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="5 3 19 12 5 21 5 3"/></svg>;
+const IconPause = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>;
+const IconSquare = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>;
+const IconArrowRight = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>;
+const IconActivity = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>;
+const IconCpu = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>;
+const IconTrendingUp = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>;
+const IconLayers = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>;
+const IconFlag = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>;
+const IconZap = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
+const IconFlask = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 3h6v7l5 8H4l5-8V3z"/><line x1="8" y1="1" x2="16" y2="1"/></svg>;
+const IconZapLab = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/><circle cx="18" cy="5" r="3"/></svg>;
+
+/* ===== FlipCard ===== */
+const FlipCard = ({ front, back, t }) => {
+  const [flipped, setFlipped] = useState(false);
+  return (
+    <div className="perspective cursor-pointer h-36" onClick={() => setFlipped(!flipped)}>
+      <div className={`transform-style-3d relative w-full h-full transition-transform duration-500 ${flipped ? 'rotate-y-180' : ''}`}>
+        <div className="backface-hidden absolute inset-0 bg-white dark:bg-slate-800 rounded-xl p-4 flex flex-col items-center justify-center border border-slate-200 dark:border-slate-700 shadow-sm">
+          <p className="font-serif font-bold text-center text-[#004030] dark:text-[#D8C3A5] text-sm">{front}</p>
+          <p className="text-xs text-slate-400 mt-2">{t.flip_prompt}</p>
+        </div>
+        <div className="backface-hidden rotate-y-180 absolute inset-0 bg-[#004030] dark:bg-slate-700 rounded-xl p-4 flex items-center justify-center">
+          <p className="text-sm text-center text-[#D8C3A5] dark:text-slate-200 leading-relaxed">{back}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ===== ModuleQuiz ===== */
+const ModuleQuiz = ({ questions, t, moduleId, onQuizSubmit }) => {
+  const [selected, setSelected] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const [quizIndices] = useState(() => [...Array(questions.length).keys()].sort(() => Math.random() - 0.5).slice(0, 4));
+  const score = submitted ? quizIndices.filter((qIdx,i) => selected[i] === questions[qIdx].ans).length : 0;
+  return (
+    <div className="mt-8 bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700">
+      <h3 className="text-lg font-bold font-serif text-[#004030] dark:text-[#D8C3A5] mb-6">{t.quiz_title}</h3>
+      {quizIndices.map((qIdx, i) => {
+        const q = questions[qIdx];
+        return (
+          <div key={qIdx} className="mb-6">
+            <p className="font-bold mb-3 text-sm">{i+1}. {q.q}</p>
+            <div className="space-y-2">
+              {q.opts.map((opt, oIdx) => (
+                <button key={oIdx} onClick={() => !submitted && setSelected(s => ({...s, [i]: oIdx}))}
+                  className={`w-full text-left px-4 py-3 rounded-lg border transition-all text-sm
+                    ${submitted
+                      ? oIdx === q.ans ? 'bg-green-100 border-green-500 dark:bg-green-900/30 dark:border-green-500'
+                        : selected[i] === oIdx ? 'bg-red-100 border-red-400 dark:bg-red-900/30 dark:border-red-400' : 'border-slate-200 dark:border-slate-700'
+                      : selected[i] === oIdx ? 'border-[#004030] dark:border-[#D8C3A5] bg-[#004030]/5' : 'border-slate-200 dark:border-slate-700 hover:border-slate-400'
+                    }`}>
+                  {opt}
+                </button>
+              ))}
+            </div>
+            {submitted && <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 italic">{t.explanation}：{q.exp}</p>}
+          </div>
+        );
+      })}
+      {submitted && <p className="mb-4 font-bold text-[#004030] dark:text-[#D8C3A5]">{t.score}：{score}/{quizIndices.length}</p>}
+      {!submitted
+        ? <button onClick={() => { setSubmitted(true); const c = quizIndices.filter((qIdx,i) => selected[i] === questions[qIdx].ans).length; onQuizSubmit(moduleId, c, quizIndices.length); }}
+            disabled={Object.keys(selected).length < quizIndices.length}
+            className="px-6 py-2 bg-[#004030] dark:bg-[#D8C3A5] text-white dark:text-[#004030] font-bold rounded-lg disabled:opacity-40 text-sm">
+            {t.submit}
+          </button>
+        : <button onClick={() => { setSelected({}); setSubmitted(false); }}
+            className="px-6 py-2 border border-[#004030] dark:border-[#D8C3A5] text-[#004030] dark:text-[#D8C3A5] font-bold rounded-lg text-sm">
+            {t.retry}
+          </button>
+      }
+    </div>
+  );
+};
+
+/* ===== LinkCard ===== */
+const LinkCard = ({label, url, desc}) => (
+  <a href={url} target="_blank" rel="noopener noreferrer"
+    className="block bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 hover:border-[#004030] dark:hover:border-[#D8C3A5] hover:shadow-md transition-all group">
+    <div className="flex items-start justify-between gap-2 mb-2">
+      <span className="font-bold font-serif text-sm text-[#004030] dark:text-[#D8C3A5] group-hover:underline leading-snug">{label}</span>
+      <svg className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+    </div>
+    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{desc}</p>
+  </a>
+);
+
+/* ===== Lab Components (Top-level) ===== */
+const FiveForcesDiagram = ({lang}) => {
+  const [active, setActive] = useState(null);
+  const forces = [
+    { id:'rivals', label: lang==='zh'?'既有競爭者對抗':'Industry Rivalry', x:50, y:50, color:'#004030', desc: lang==='zh'?'產業內現有廠商之間的競爭強度，受集中度、差異化、退出障礙等影響。':'Intensity of competition among existing firms, affected by concentration, differentiation, exit barriers.' },
+    { id:'entry', label: lang==='zh'?'新進入者威脅':'Threat of Entry', x:50, y:10, color:'#b45309', desc: lang==='zh'?'進入障礙高低決定新進者對產業獲利的威脅程度。':'Height of entry barriers determines the threat new entrants pose to profitability.' },
+    { id:'substitutes', label: lang==='zh'?'替代品威脅':'Substitutes', x:50, y:90, color:'#7c3aed', desc: lang==='zh'?'替代品的價格-效能比越高，越能限制產業的定價能力。':'Higher price-performance of substitutes constrains industry pricing power.' },
+    { id:'buyers', label: lang==='zh'?'買方議價力':'Buyer Power', x:90, y:50, color:'#0369a1', desc: lang==='zh'?'買方集中度越高、轉換成本越低，買方議價力越強。':'Higher buyer concentration and lower switching costs increase buyer power.' },
+    { id:'suppliers', label: lang==='zh'?'供應商議價力':'Supplier Power', x:10, y:50, color:'#be123c', desc: lang==='zh'?'供應商越集中、差異化越高，其議價力越強。':'More concentrated and differentiated suppliers have stronger bargaining power.' },
+  ];
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700">
+      <h3 className="font-serif font-bold text-lg text-[#004030] dark:text-[#D8C3A5] mb-4">{lang==='zh'?'🔬 互動式五力分析圖':'🔬 Interactive Five Forces Diagram'}</h3>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{lang==='zh'?'點擊各力量查看詳細說明':'Click each force to see details'}</p>
+      <div className="relative w-full" style={{paddingBottom:'70%'}}>
+        {forces.map(f => (
+          <button key={f.id} onClick={() => setActive(active===f.id?null:f.id)}
+            style={{position:'absolute', left:`${f.x}%`, top:`${f.y}%`, transform:'translate(-50%,-50%)'}}
+            className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md border-2 ${active===f.id?'scale-110 ring-2 ring-offset-2 ring-[#D8C3A5]':'hover:scale-105'}`}
+            style={{position:'absolute', left:`${f.x}%`, top:`${f.y}%`, transform:'translate(-50%,-50%)', backgroundColor: f.color, color:'white', borderColor: active===f.id?'#D8C3A5':f.color}}>
+            {f.label}
+          </button>
+        ))}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 70">
+          <line x1="50" y1="18" x2="50" y2="38" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
+          <line x1="50" y1="58" x2="50" y2="55" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
+          <line x1="20" y1="35" x2="38" y2="35" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
+          <line x1="62" y1="35" x2="80" y2="35" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
+        </svg>
+      </div>
+      {active && <div className="mt-4 p-4 bg-[#004030]/5 dark:bg-[#D8C3A5]/5 rounded-xl border border-[#004030]/20 dark:border-[#D8C3A5]/20">
+        <p className="text-sm text-slate-700 dark:text-slate-300">{forces.find(f=>f.id===active)?.desc}</p>
+      </div>}
+    </div>
+  );
+};
+
+const HHICalculator = ({lang}) => {
+  const [shares, setShares] = useState([40, 30, 20, 10]);
+  const hhi = shares.reduce((sum, s) => sum + s*s, 0);
+  const cr4 = shares.reduce((sum, s) => sum + s, 0);
+  const getLevel = () => hhi < 1500 ? (lang==='zh'?'低度集中':'Low Concentration') : hhi < 2500 ? (lang==='zh'?'中度集中':'Moderate Concentration') : (lang==='zh'?'高度集中':'High Concentration');
+  const colors = ['#004030','#0369a1','#D8C3A5','#b45309'];
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700">
+      <h3 className="font-serif font-bold text-lg text-[#004030] dark:text-[#D8C3A5] mb-4">{lang==='zh'?'📊 HHI 集中度計算器':'📊 HHI Concentration Calculator'}</h3>
+      <div className="space-y-3 mb-4">
+        {shares.map((s,i) => (
+          <div key={i} className="flex items-center gap-3">
+            <span className="text-xs font-bold w-16 shrink-0" style={{color:colors[i]}}>{lang==='zh'?`廠商 ${i+1}`:`Firm ${i+1}`}</span>
+            <input type="range" min="0" max="100" value={s} onChange={e => { const n=[...shares]; n[i]=+e.target.value; setShares(n); }} className="flex-1 h-2 rounded-lg appearance-none cursor-pointer" style={{accentColor:colors[i]}}/>
+            <span className="text-sm font-mono w-10 text-right">{s}%</span>
+          </div>
+        ))}
+      </div>
+      <div className="flex items-center gap-3 mb-3">
+        {shares.map((s,i) => (
+          <div key={i} style={{width:`${s}%`, backgroundColor:colors[i], minWidth: s>0?'4px':'0'}} className="h-8 rounded transition-all duration-300"/>
+        ))}
+      </div>
+      <div className="grid grid-cols-3 gap-2 text-center">
+        <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-3">
+          <p className="text-lg font-black font-serif text-[#004030] dark:text-[#D8C3A5]">{hhi}</p>
+          <p className="text-xs text-slate-500">HHI</p>
+        </div>
+        <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-3">
+          <p className="text-lg font-black font-serif text-[#004030] dark:text-[#D8C3A5]">{cr4}%</p>
+          <p className="text-xs text-slate-500">CR4</p>
+        </div>
+        <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-3">
+          <p className="text-sm font-bold text-[#004030] dark:text-[#D8C3A5]">{getLevel()}</p>
+          <p className="text-xs text-slate-500">{lang==='zh'?'集中程度':'Level'}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const BarrierSimulator = ({lang}) => {
+  const [capital, setCapital] = useState(3);
+  const [scale, setScale] = useState(3);
+  const [brand, setBrand] = useState(2);
+  const [regulation, setRegulation] = useState(4);
+  const avg = ((capital+scale+brand+regulation)/4).toFixed(1);
+  const items = [
+    { label: lang==='zh'?'資本需求':'Capital Req.', val: capital, set: setCapital, color:'#004030' },
+    { label: lang==='zh'?'規模經濟':'Scale Econ.', val: scale, set: setScale, color:'#0369a1' },
+    { label: lang==='zh'?'品牌忠誠':'Brand Loyalty', val: brand, set: setBrand, color:'#D8C3A5' },
+    { label: lang==='zh'?'法規障礙':'Regulation', val: regulation, set: setRegulation, color:'#b45309' },
+  ];
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700">
+      <h3 className="font-serif font-bold text-lg text-[#004030] dark:text-[#D8C3A5] mb-4">{lang==='zh'?'🏗️ 進入障礙模擬器':'🏗️ Entry Barrier Simulator'}</h3>
+      <div className="space-y-3 mb-4">
+        {items.map((it,i) => (
+          <div key={i}>
+            <div className="flex justify-between text-xs mb-1"><span className="font-bold">{it.label}</span><span>{it.val}/5</span></div>
+            <input type="range" min="1" max="5" value={it.val} onChange={e=>it.set(+e.target.value)} className="w-full h-2 rounded appearance-none cursor-pointer" style={{accentColor:it.color}}/>
+          </div>
+        ))}
+      </div>
+      <div className="text-center bg-[#004030]/5 dark:bg-[#D8C3A5]/5 rounded-xl p-4">
+        <p className="text-2xl font-black font-serif text-[#004030] dark:text-[#D8C3A5]">{avg}/5.0</p>
+        <p className="text-xs text-slate-500">{lang==='zh'?'綜合進入障礙高度':'Overall Entry Barrier Height'}</p>
+        <p className="text-sm mt-1 font-bold">{avg>=4?(lang==='zh'?'🔒 極高障礙':'🔒 Very High'):avg>=3?(lang==='zh'?'🔐 中高障礙':'🔐 Moderate-High'):avg>=2?(lang==='zh'?'🔓 中低障礙':'🔓 Moderate-Low'):(lang==='zh'?'🔓 低障礙':'🔓 Low')}</p>
+      </div>
+    </div>
+  );
+};
+
+const ProfitabilityChart = ({lang}) => {
+  const data = [
+    { name: lang==='zh'?'菸草':'Tobacco', roe: 36.2 },
+    { name: lang==='zh'?'家用品':'Household', roe: 27.0 },
+    { name: lang==='zh'?'製藥':'Pharma', roe: 20.5 },
+    { name: lang==='zh'?'食品服務':'Food Svc', roe: 21.7 },
+    { name: lang==='zh'?'半導體':'Semicon.', roe: 8.6 },
+    { name: lang==='zh'?'電信':'Telecom', roe: 7.0 },
+    { name: lang==='zh'?'汽車':'Autos', roe: 6.4 },
+    { name: lang==='zh'?'航空':'Airlines', roe: -7.1 },
+  ];
+  const max = 40;
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700">
+      <h3 className="font-serif font-bold text-lg text-[#004030] dark:text-[#D8C3A5] mb-4">{lang==='zh'?'📈 美國產業獲利率比較 (ROE%)':'📈 US Industry Profitability (ROE%)'}</h3>
+      <div className="space-y-2">
+        {data.map((d,i) => (
+          <div key={i} className="flex items-center gap-2">
+            <span className="text-xs w-16 shrink-0 text-right font-medium">{d.name}</span>
+            <div className="flex-1 bg-slate-100 dark:bg-slate-700 rounded h-5 relative overflow-hidden">
+              <div className={`h-full rounded transition-all duration-500 ${d.roe>=0?'bg-[#004030] dark:bg-[#D8C3A5]':'bg-red-500'}`}
+                style={{width:`${Math.abs(d.roe)/max*100}%`, marginLeft: d.roe<0?'auto':'0', float: d.roe<0?'right':'left'}}/>
+            </div>
+            <span className="text-xs font-mono w-12 text-right">{d.roe}%</span>
+          </div>
+        ))}
+      </div>
+      <p className="text-xs text-slate-400 mt-3">{lang==='zh'?'資料來源：Fortune 500, 2000-2013 中位數 ROE':'Source: Fortune 500, 2000-2013 Median ROE'}</p>
+    </div>
+  );
+};
+
+const KSFAnalyzer = ({lang}) => {
+  const [industry, setIndustry] = useState(0);
+  const industries = [
+    { name: lang==='zh'?'鋼鐵業':'Steel', demand: lang==='zh'?'低價、品質一致、供應穩定':'Low price, consistency, reliable supply', competition: lang==='zh'?'低差異化、高固定成本、退出障礙高→激烈價格戰':'Undifferentiated, high FC, exit barriers → fierce price war', ksf: lang==='zh'?'成本效率（大規模廠房）、財務實力':'Cost efficiency (large-scale plants), financial strength' },
+    { name: lang==='zh'?'時尚服飾':'Fashion', demand: lang==='zh'?'多元偏好、願付品牌溢價':'Diverse preferences, willingness to pay brand premium', competition: lang==='zh'?'低進入障礙、買方力量強→快速模仿':'Low entry barriers, strong buyer power → rapid imitation', ksf: lang==='zh'?'差異化與低成本結合、快速回應流行':'Differentiation + low cost, speed of response to trends' },
+    { name: lang==='zh'?'超市量販':'Supermarket', demand: lang==='zh'?'低價、便利位置、產品齊全':'Low prices, convenient location, wide range', competition: lang==='zh'?'取決於競爭者數量與距離、買方議價力':'Depends on proximity of competitors, buyer bargaining power', ksf: lang==='zh'?'營運效率、大量採購、在地化策略':'Operational efficiency, large-scale purchasing, localization' },
+  ];
+  const ind = industries[industry];
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700">
+      <h3 className="font-serif font-bold text-lg text-[#004030] dark:text-[#D8C3A5] mb-4">{lang==='zh'?'🎯 KSF 辨識工具':'🎯 KSF Identification Tool'}</h3>
+      <div className="flex gap-2 mb-4 flex-wrap">
+        {industries.map((ind,i) => (
+          <button key={i} onClick={()=>setIndustry(i)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${industry===i?'bg-[#004030] text-white dark:bg-[#D8C3A5] dark:text-[#004030]':'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'}`}>{ind.name}</button>
+        ))}
+      </div>
+      <div className="space-y-3">
+        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"><p className="text-xs font-bold text-blue-800 dark:text-blue-300 mb-1">{lang==='zh'?'顧客需求':'Customer Demand'}</p><p className="text-sm">{ind.demand}</p></div>
+        <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg"><p className="text-xs font-bold text-orange-800 dark:text-orange-300 mb-1">{lang==='zh'?'競爭態勢':'Competition'}</p><p className="text-sm">{ind.competition}</p></div>
+        <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"><p className="text-xs font-bold text-green-800 dark:text-green-300 mb-1">{lang==='zh'?'關鍵成功因素':'Key Success Factors'}</p><p className="text-sm font-bold">{ind.ksf}</p></div>
+      </div>
+    </div>
+  );
+};
+
+/* ===== DICT ===== */
+const N = 6;
+const TOTAL = 1 + N + 3; // M0 + M1-M6 + Resources + Lab + Analytics = 10
+
+const dict = {
+zh: {
+title:"產業分析：外部環境與產業結構", subtitle:"SMMC · 互動學習系列",
+nav_modules:"單元目錄", nav_prev:"上一單元", nav_next:"下一單元",
+key_terms:"關鍵專有名詞", flip_prompt:"點擊翻轉", audio_read:"語音導覽",
+quiz_title:"模組知識檢定（隨機 4 題）",
+submit:"提交答案", retry:"重新測驗",
+score:"得分", correct:"正確", incorrect:"錯誤", explanation:"解析",
+analytics_title:"學習歷程分析", analytics_desc:"追蹤您的學習進度、互動頻率與測驗表現",
+analytics_form_title:"填寫學習者資訊",
+analytics_group:"組別", analytics_dept:"系級",
+analytics_dept_ph:"例：IBS3", analytics_id:"學號", analytics_id_ph:"例：112212099",
+analytics_name:"姓名", analytics_name_ph:"例：Jimmy Lo",
+analytics_export_csv:"匯出 CSV 歷程記錄",
+analytics_fill_required:"請填寫完整資訊以解鎖匯出",
+group_options:["G1","G2","G3","G4","G5","G6","Others"],
+analytics_total_time:"總學習時間", analytics_total_clicks:"總互動點擊",
+analytics_overall_acc:"總體測驗答對率",
+analytics_module:"模組", analytics_time:"停留時間",
+analytics_clicks:"點擊次數", analytics_acc:"答對率",
+analytics_correct_ans_total:"答對 / 已填答 / 總題數",
+analytics_no_data:"尚未測驗", analytics_sec:"秒", analytics_times:"次",
+
+m0_nav:"0. 課程總覽",
+m0_title:"產業分析的基礎與實踐",
+m0_intro:"本課程以 Grant 教科書第三章與羅老師講義為核心，系統性地探討產業環境分析的理論工具與實務應用。從總體環境聚焦到產業層級，掌握 Porter 五力分析、SCP 典範與產業結構理論，學習如何預測產業獲利趨勢並制定競爭策略。",
+m0_why:"為什麼產業分析重要？",
+m0_why_desc:"Warren Buffett 曾說：「當聲譽卓著的管理團隊遇上基本面不佳的產業，保持完好的是產業的聲譽。」產業結構決定了競爭強度與獲利水準，是策略分析的核心起點。理解產業分析，就是掌握利潤的源頭。",
+m0_stats:[
+  { val:"5", label:"大競爭力量" },
+  { val:"6", label:"學習模組" },
+  { val:"48", label:"測驗題目" },
+  { val:"4+", label:"互動實驗室" }
+],
+m0_modules:[
+  { num:"01", title:"從總體環境到產業分析", desc:"PESTEL → 產業環境，定義產業與市場的邊界" },
+  { num:"02", title:"產業結構的經濟學基礎", desc:"SCP 典範、市場結構光譜、集中度指標" },
+  { num:"03", title:"Porter 五力競爭架構", desc:"五種競爭力量的系統性分析與結構決定因素" },
+  { num:"04", title:"進入障礙與產業對抗", desc:"七大進入障礙、退出障礙、成本結構與競爭動態" },
+  { num:"05", title:"產業獲利預測與策略應用", desc:"改變結構策略、企業定位、建築優勢" },
+  { num:"06", title:"關鍵成功因素辨識", desc:"從需求與競爭雙軸辨識 KSF，獲利模型拆解" }
+],
+m0_start:"開始學習 →",
+
+// M1
+m1_nav:"1. 環境→產業",
+m1_title:"從總體環境到產業分析",
+m1_p1:"企業的外部環境涵蓋無數影響因素。PESTEL 分析（政治、經濟、社會、科技、生態、法律）提供了總體環境的掃描架構，但真正驅動企業決策與績效的核心，是其「產業環境」——由顧客、供應商與競爭者三組關係所構成。",
+m1_p2:"「為了獲利，企業必須為顧客創造價值。因此，它必須理解顧客、管理供應商關係、並掌握競爭動態。這三組關係構成了企業產業環境的核心。」——Robert M. Grant",
+m1_p3:"產業的定義與市場密切相關卻不完全相同：經濟學家將「產業」定義為供給某一市場的廠商集合。產業分析同時考察產品市場與要素市場的競爭。關鍵問題是：如何劃定產業邊界？答案取決於需求面替代性（消費者是否在不同產品間轉換）與供給面替代性（生產者能否轉換供給）。",
+m1_cards:[
+  { title:"微個案：台灣電信業的產業邊界", desc:"台灣電信市場長期由中華電信、台灣大哥大、遠傳三大業者主導，形成典型寡占結構。2023年台灣之星併入台灣大、亞太電信併入遠傳後，市場更加集中。產業邊界如何劃定？若僅看行動通訊，三大業者互為直接競爭者；若納入固網、寬頻與OTT串流，則競爭者範圍大幅擴展。此案例展現了 Grant 所述「產業邊界劃定取決於分析目的」的關鍵原則。" },
+  { title:"產業 vs. 市場 vs. 部門", desc:"部門（Sector）是最廣泛的分類，如「電腦部門」；產業（Industry）聚焦於供給替代或互補產品的廠商集合；市場（Market）則以消費者為中心，包含產品市場與要素市場。羅老師的講義以電腦產業為例，區分了零組件、硬體、軟體三個子產業，並進一步拆解至市場區隔（筆電、桌機、伺服器）。" }
+],
+m1_terms:[
+  { front:"PESTEL 分析", back:"總體環境掃描工具：Political（政治）、Economic（經濟）、Social（社會）、Technological（科技）、Ecological（生態）、Legal（法律）。" },
+  { front:"產業 Industry", back:"供給（生產或提供）替代或互補產品或服務的廠商集合。與「市場」的差異在於產業以生產端為視角。" },
+  { front:"替代性 Substitutability", back:"產業邊界劃定的關鍵原則，分為需求面替代（消費者轉換意願）與供給面替代（生產者轉換能力）。" }
+],
+m1_q:[
+  { q:"PESTEL 中的 'E' 分別代表什麼？", opts:["Economic 與 Ecological","Education 與 Environment","Economic 與 Education","Ecological 與 Ethical"], ans:0, exp:"PESTEL 的兩個 E 分別是 Economic（經濟）與 Ecological（生態/環境）。" },
+  { q:"根據 Grant，企業產業環境的核心由哪三組關係構成？", opts:["政府、媒體、競爭者","顧客、供應商、競爭者","股東、員工、顧客","技術、資本、人才"], ans:1, exp:"Grant 指出產業環境由顧客、供應商與競爭者三組核心關係形成。" },
+  { q:"經濟學家如何定義「產業」？", opts:["消費者的集合","供給某一市場的廠商集合","政府管轄的業別","所有上市公司的統稱"], ans:1, exp:"經濟學家將產業定義為供給某一市場的廠商集合，強調生產端視角。" },
+  { q:"劃定產業邊界的核心原則是什麼？", opts:["政府分類標準","SIC 產業代碼","需求面與供給面的替代性","公司規模大小"], ans:2, exp:"產業邊界取決於消費者轉換意願（需求面）與生產者轉換供給能力（供給面）。" },
+  { q:"台灣 2023 年電信業合併後形成什麼市場結構？", opts:["完全競爭","壟斷性競爭","三大寡占","獨占"], ans:2, exp:"台灣之星併入台灣大、亞太併入遠傳後，形成中華電信、台灣大、遠傳三大寡占。" },
+  { q:"以下何者不是 Grant 所述的「外部環境分類方式」？", opts:["PEST 分析","五力分析","SWOT 分析中的 OT","價值鏈分析"], ans:3, exp:"價值鏈分析屬於企業內部分析工具，而非外部環境分類。" },
+  { q:"產業（Industry）與市場（Market）的主要差異為何？", opts:["完全相同","產業以生產端為視角，市場以消費端為視角","產業較小，市場較大","產業只限製造業"], ans:1, exp:"產業聚焦於供給面（廠商集合），市場涵蓋供需雙方的交易關係。" },
+  { q:"供給面替代性的意思是什麼？", opts:["消費者願意購買替代品","生產者能夠轉換生產不同產品","供應商有議價能力","政府法規限制進入"], ans:1, exp:"供給面替代性指生產者能否運用既有設備與通路來供應不同產品。" }
+],
+
+// M2
+m2_nav:"2. 經濟學基礎",
+m2_title:"產業結構的經濟學基礎",
+m2_p1:"產業分析的理論根基來自產業組織經濟學（Industrial Organization, IO），其核心是「結構—行為—績效」（Structure-Conduct-Performance, SCP）典範。SCP 認為產業的基本條件（需求與供給特性）決定了市場結構，結構影響廠商行為，行為最終決定產業績效。",
+m2_p2:"「在獨占中，單一廠商可以將創造的全部價值據為利潤；在完全競爭中，利潤率將降至僅能覆蓋資本成本的水準。現實中的大多數產業介於兩者之間。」——Grant",
+m2_p3:"市場結構光譜從完全競爭（Many firms, no barriers, homogeneous products）延伸至獨占（One firm, high barriers）。中間的寡占（Oligopoly）是最常見的產業形態。衡量市場集中度的常用指標包括 CR4（前四大廠商市占率合計）、HHI（赫芬達爾指數，各廠商市占率平方和）與 Lerner Index（價格超過邊際成本的比率）。",
+m2_cards:[
+  { title:"微個案：台灣半導體產業的寡占結構", desc:"全球晶圓代工市場呈現高度集中的寡占結構。台積電（TSMC）以約 60% 的全球市占率穩居龍頭，三星約 12%，聯電約 6%。以 HHI 計算，僅台積電一家就貢獻 3,600 點（60²），遠超 2,500 的「高度集中」門檻。這種結構源自極高的進入障礙：先進製程（3nm 以下）開發成本逾 200 億美元、需數千項專利與長年累積的製程知識（學習曲線經濟）。台積電透過「純代工」商業模式建立的客戶信任、對 ASML EUV 光刻機的優先取得權，以及在全球建廠（美國亞利桑那、日本熊本）的佈局，持續鞏固其近乎壟斷的市場地位。" },
+  { title:"SCP 與 Porter 五力的關係", desc:"SCP 典範提供了產業分析的經濟學理論基礎，Porter 五力則是將其轉化為策略管理的實用工具。SCP 的「結構」對應五力的產業結構特徵（集中度、障礙等）；「行為」對應廠商的策略選擇（定價、差異化、合謀等）；「績效」即產業獲利水準。政府政策（管制、補貼、反壟斷）則是影響 SCP 各層級的外生力量。" }
+],
+m2_terms:[
+  { front:"SCP 典範", back:"Structure-Conduct-Performance。產業組織經濟學核心架構：基本條件→結構→行為→績效，各層級雙向互動。" },
+  { front:"HHI 赫芬達爾指數", back:"Herfindahl-Hirschman Index = Σsi²。<1500 為低集中、1500-2500 為中度、>2500 為高度集中。美國司法部以此審查企業合併。" },
+  { front:"Lerner Index", back:"L = (P - MC) / P = 1/(-ε)。衡量市場力量的指標，完全競爭下 L=0，壟斷下 L>0。" }
+],
+m2_q:[
+  { q:"SCP 典範中，S、C、P 分別代表什麼？", opts:["Strategy, Competition, Profit","Structure, Conduct, Performance","Supply, Cost, Price","Strength, Capability, Position"], ans:1, exp:"SCP = Structure（結構）、Conduct（行為）、Performance（績效）。" },
+  { q:"HHI 值超過多少被視為「高度集中」？", opts:["1000","1500","2500","5000"], ans:2, exp:"美國司法部標準：HHI > 2500 為高度集中市場。" },
+  { q:"完全競爭市場的特徵不包括以下哪一項？", opts:["眾多買賣雙方","同質化產品","無進出障礙","產品高度差異化"], ans:3, exp:"完全競爭的核心特徵是產品同質（homogeneous），非高度差異化。" },
+  { q:"台積電在全球晶圓代工的市占率約為多少？", opts:["30%","45%","60%","80%"], ans:2, exp:"台積電以約 60% 的全球市占率穩居晶圓代工龍頭。" },
+  { q:"Lerner Index 在完全競爭下的值為何？", opts:["0","0.5","1","不確定"], ans:0, exp:"完全競爭下 P = MC，故 L = (P-MC)/P = 0。" },
+  { q:"CR4 代表什麼？", opts:["前四名買方的購買比例","前四大廠商的市占率合計","四種競爭力量","四個產業區隔"], ans:1, exp:"CR4 = 前四大廠商（sellers）市場佔有率的加總。" },
+  { q:"寡占市場的主要特徵是什麼？", opts:["無數小廠商","單一廠商壟斷","少數幾家大廠主導","產品完全同質"], ans:2, exp:"寡占（Oligopoly）指少數幾家大企業主導市場競爭。" },
+  { q:"SCP 中哪個層級涉及政府的管制政策？", opts:["僅結構","僅行為","僅績效","橫跨各層級"], ans:3, exp:"政府政策可影響 SCP 的每一個層級（結構、行為與績效）。" }
+],
+
+// M3
+m3_nav:"3. 五力架構",
+m3_title:"Porter 五力競爭架構",
+m3_p1:"Michael Porter 的五力分析是產業分析最廣泛使用的架構。它從五個方面檢視產業競爭的強度與獲利潛力：三個「水平」競爭來源（替代品、新進入者、既有對手）與兩個「垂直」議價力量（供應商、買方）。",
+m3_p2:"「產業的獲利能力並非隨機產生，也非完全取決於產業特有的因素——它由產業結構的系統性影響所決定。」——Grant",
+m3_p3:"替代品威脅取決於買方的替代傾向與替代品的相對價格-效能比。新進入者威脅受進入障礙高低影響。既有競爭者的對抗強度由集中度、差異化程度、超額產能與退出障礙等因素決定。買方與供應商的議價力則取決於各自的集中度、資訊掌握程度與垂直整合能力。",
+m3_cards:[
+  { title:"微個案：台灣便利商店產業五力分析", desc:"台灣便利商店密度全球第一（約每 1,500 人一家）。以 7-Eleven（統一超商）與全家為雙寡頭，合計市占超過 70%。五力分析：(1) 既有競爭者對抗——高度集中但競爭激烈，聚焦非價格競爭（鮮食創新、集點活動、跨業合作）；(2) 新進入者威脅——低。密集的展店網絡、供應鏈整合與品牌忠誠構成極高進入障礙；(3) 替代品威脅——中。超市（全聯）、電商平台（momo）提供替代購物選擇；(4) 供應商議價力——低。便利商店大量採購且自有品牌比例高；(5) 買方議價力——低。個別消費者購買金額小、轉換成本低但便利性形成黏著度。產業獲利啟示：高集中度加上高進入障礙，使雙寡頭能維持穩定獲利。" },
+  { title:"五力的結構決定因素", desc:"每一種競爭力量都由特定的結構變數決定。例如「替代品威脅」受買方替代傾向與替代品的相對價格-效能影響；「進入威脅」受資本需求、規模經濟、品牌忠誠等障礙影響；「既有對抗」受集中度、差異化、退出障礙影響；「買方力量」受買方集中度、資訊透明度、垂直整合能力影響；「供應商力量」則鏡像對應買方力量的各項因素。" }
+],
+m3_terms:[
+  { front:"五力分析 Five Forces", back:"Porter 提出的產業分析架構，五種力量決定產業獲利能力：替代品、新進者、既有對抗、買方力量、供應商力量。" },
+  { front:"替代品威脅 Substitutes", back:"當替代品的價格-效能比優於現有產品，消費者轉移意願升高，限制產業的定價能力。" },
+  { front:"議價力 Bargaining Power", back:"買方或供應商透過拒絕交易的威脅來影響價格與條件的能力，取決於集中度、資訊與替代選項。" }
+],
+m3_q:[
+  { q:"Porter 五力中的三個「水平」競爭來源是什麼？", opts:["供應商、買方、政府","替代品、新進入者、既有對手","技術、人才、資本","上游、中游、下游"], ans:1, exp:"三個水平競爭來源：替代品競爭、新進入者威脅、既有競爭者對抗。" },
+  { q:"替代品威脅的強弱主要取決於什麼？", opts:["替代品的品牌知名度","買方的替代傾向與替代品的價格-效能比","供應商的數量","政府管制程度"], ans:1, exp:"替代品威脅取決於消費者轉換意願與替代品相對價格-效能。" },
+  { q:"台灣便利商店產業最主要的非價格競爭方式是？", opts:["大幅降價促銷","鮮食創新與集點活動","擴大店面面積","提高商品價格"], ans:1, exp:"台灣便利商店以鮮食研發、集點行銷與跨業合作為核心競爭手段。" },
+  { q:"五力架構中，「垂直」競爭力量是指什麼？", opts:["替代品與新進者","供應商議價力與買方議價力","既有對手與潛在對手","上游與下游的競爭"], ans:1, exp:"兩個垂直力量指供應商議價力與買方議價力。" },
+  { q:"在買方集中度高的情況下，對供應產業的影響是什麼？", opts:["提高產業獲利","降低供應產業的價格與利潤","增加進入障礙","減少替代品威脅"], ans:1, exp:"買方越集中，議價力越強，會壓低供應產業的價格與利潤。" },
+  { q:"五力分析的主要用途是什麼？", opts:["分析企業內部資源","評估員工績效","判定產業的獲利潛力","預測總體經濟走勢"], ans:2, exp:"五力分析的核心用途是分析產業結構如何決定競爭強度與獲利潛力。" },
+  { q:"以下何者會增強供應商的議價力？", opts:["供應商數量眾多","產品可輕易替代","供應商高度集中且具獨特技術","買方垂直整合能力強"], ans:2, exp:"供應商越集中、產品越獨特，其議價力越強。" },
+  { q:"Porter 五力分析最初發表於何處？", opts:["《國富論》","《哈佛商業評論》","《經濟學原理》","《管理學期刊》"], ans:1, exp:"Porter 五力分析於 1979 年發表於《Harvard Business Review》。" }
+],
+
+// M4
+m4_nav:"4. 進入障礙",
+m4_title:"進入障礙與產業對抗",
+m4_p1:"進入障礙是新進入者相對於既有廠商所面臨的劣勢，障礙越高，產業獲利越受保護。Grant 歸納了七大進入障礙來源：資本需求、規模經濟、絕對成本優勢、產品差異化、通路取得、政府與法規障礙、以及報復預期。",
+m4_p2:"「嚇阻進入者是維繫長期高獲利的關鍵策略。美國醫學會的首要目標之一，就是透過控制醫生培訓數量與限制海外醫生進入，來維護其會員的收入水準。」——Grant",
+m4_p3:"退出障礙同樣影響產業獲利。當資產具有耐久性與專用性、員工受到就業保障、且退出伴隨高額成本時，即使需求下滑，超額產能也難以離開產業，持續壓低價格與利潤。成本結構（固定成本與變動成本的比率）也至關重要：當固定成本比率高時，企業傾向以任何高於變動成本的價格接受訂單，導致價格戰。",
+m4_cards:[
+  { title:"微個案：台積電如何築高進入障礙", desc:"台積電的護城河由多重進入障礙疊加而成。首先是驚人的資本需求：單一先進製程晶圓廠投資額超過 200 億美元，2024 年資本支出達 320 億美元。其次是規模經濟與學習曲線：數十年累積的製程知識讓良率領先競爭者數個百分點，每個百分點可能意味著數十億美元的差異。第三是絕對成本優勢：台積電是 ASML 最大客戶，優先取得最先進的 EUV 光刻機。第四是垂直整合策略：投資上游設備商（如 ASML）、自行開發先進封裝技術（CoWoS、InFO），將價值鏈延伸至下游。最後是「純代工」定位創造的信任障礙：客戶不擔心智財外洩，這是三星等具有自有品牌產品的競爭者難以複製的優勢。" },
+  { title:"可競爭市場理論", desc:"若產業不存在沉沒成本（sunk costs），即使只有少數廠商，利潤也趨向競爭水準。因為潛在進入者可以進行「打帶跑」式進入：在既有廠商提價時迅速進入，獲利後退出。然而多數產業存在沉沒成本，使得進入障礙非零。此理論提醒我們：威脅進入本身就可能限制既有廠商的定價能力。" }
+],
+m4_terms:[
+  { front:"進入障礙 Barriers to Entry", back:"新進入者相對於既有廠商所面臨的劣勢。來源包括資本需求、規模經濟、品牌忠誠、法規限制與報復預期等。" },
+  { front:"退出障礙 Exit Barriers", back:"使產能無法離開產業的因素，如資產專用性、員工保障、環境清理成本等。高退出障礙加劇超額產能問題。" },
+  { front:"沉沒成本 Sunk Costs", back:"投入後無法在退出時回收的成本。沉沒成本越高，產業越不具可競爭性（contestability）。" }
+],
+m4_q:[
+  { q:"Grant 歸納的七大進入障礙不包括以下哪一項？", opts:["資本需求","規模經濟","員工滿意度","政府與法規障礙"], ans:2, exp:"七大進入障礙：資本需求、規模經濟、絕對成本優勢、產品差異化、通路取得、法規障礙、報復預期。" },
+  { q:"台積電的先進製程晶圓廠投資額約為多少？", opts:["5 億美元","20 億美元","200 億美元以上","1 兆美元"], ans:2, exp:"台積電單一先進製程晶圓廠投資額超過 200 億美元。" },
+  { q:"可競爭市場（contestable market）的關鍵條件是什麼？", opts:["市場有很多廠商","沒有沉沒成本","產品高度差異化","政府嚴格管制"], ans:1, exp:"可競爭市場的核心條件是不存在沉沒成本，使得進出自由。" },
+  { q:"退出障礙高的產業在需求下滑時會出現什麼問題？", opts:["廠商快速退出","超額產能持續壓低價格","利潤立即改善","新進者大量湧入"], ans:1, exp:"高退出障礙使產能無法退出，超額產能持續壓低產業價格與利潤。" },
+  { q:"固定成本比率高的產業在景氣衰退時的特徵是什麼？", opts:["價格穩定","利潤波動極大","退出障礙低","新進者增加"], ans:1, exp:"高固定成本比率意味著營收波動會被放大為更大的利潤波動。" },
+  { q:"台積電的「純代工」定位如何構成進入障礙？", opts:["降低成本","建立客戶智財保護的信任","增加產能","提高價格"], ans:1, exp:"純代工模式讓客戶不擔心智財外洩，創造了競爭者難以複製的信任優勢。" },
+  { q:"品牌忠誠度高的產品類別不包括以下哪一項？", opts:["化妝品","寵物食品","大宗商品（如鐵礦石）","牙膏"], ans:2, exp:"大宗商品（commodities）幾乎沒有品牌差異化，忠誠度極低。" },
+  { q:"航空業的「週期性」獲利波動主要源自什麼？", opts:["高度差異化","高固定成本比率加上超額產能","進入障礙極高","供應商力量弱"], ans:1, exp:"航空業固定成本高，空位邊際成本極低，超額產能時傾向大幅降價。" }
+],
+
+// M5
+m5_nav:"5. 獲利與策略",
+m5_title:"產業獲利預測與策略應用",
+m5_p1:"產業分析不只是解釋過去，更要預測未來。預測產業獲利分三步：(1) 分析現有結構如何導致目前的競爭與獲利水準；(2) 辨識正在改變結構的趨勢；(3) 評估這些結構變化將如何影響五力與獲利。",
+m5_p2:"「目前的獲利是對未來的不良指標——報紙、太陽能面板與投資銀行業都經歷了獲利的崩塌；而化學與食品加工業的獲利卻復甦了。」——Grant",
+m5_p3:"企業可從兩個面向運用產業分析發展策略。第一，改變產業結構：透過合併提高集中度（如鐵礦石三巨頭）、建立進入障礙（如醫師公會限制從業人數）、或創造瓶頸（如 Apple 透過 iTunes 的 DRM 鎖定消費者）。第二，定位策略：在產業中尋找競爭力量最弱的位置。Jacobides 提出的「建築優勢」更進一步，鼓勵企業主動塑造整個價值鏈的角色與利潤分配。",
+m5_cards:[
+  { title:"微個案：台灣面板產業的結構崩壞與轉型", desc:"台灣面板業曾是產值數千億的明星產業，但產業結構的惡化導致持續虧損。友達（AUO）與群創（Innolux）面臨的困境可用五力完整解釋：(1) 既有對抗——三星、LG、京東方的激烈價格戰；(2) 超額產能——中國大陸政府補貼驅動的大量產能進入；(3) 買方議價力強——蘋果、三星等終端品牌高度集中；(4) 替代品——OLED、Micro LED 等新顯示技術的威脅。面對此結構困境，台灣面板廠選擇「定位策略」：退出消費性面板的紅海，轉向車用面板、醫療顯示器、電競螢幕等高附加價值利基市場，透過差異化規避最激烈的競爭力量。" },
+  { title:"建築優勢 Architectural Advantage", desc:"Jacobides 鼓勵企業從整個產業生態系的視角出發，辨識「瓶頸」——稀缺且可控的活動環節。三種建構方式：(1) 創造自身瓶頸（如 Apple 的 iTunes DRM）；(2) 消除其他環節的瓶頸（如 Google 開發 Android 防止他人控制行動作業系統）；(3) 重新定義角色（如 IKEA 將傢俱組裝責任從製造商轉移至消費者）。" }
+],
+m5_terms:[
+  { front:"定位策略 Positioning", back:"在產業中尋找競爭力量最弱的細分市場或策略位置，使企業得以獲取較高利潤。" },
+  { front:"建築優勢 Architectural Advantage", back:"Jacobides 提出：企業透過塑造產業價值鏈的結構（創造或消除瓶頸、重新定義角色），獲取超額利潤。" },
+  { front:"瓶頸 Bottleneck", back:"價值鏈中稀缺且可被控制的關鍵環節。掌握瓶頸的廠商可獲取超額利潤（如台積電在先進製程代工環節）。" }
+],
+m5_q:[
+  { q:"預測產業獲利的三步驟中，第一步是什麼？", opts:["辨識結構變化趨勢","分析現有結構如何導致目前競爭與獲利","評估結構變化對五力的影響","計算 HHI 指數"], ans:1, exp:"第一步是分析產業現有結構如何導致目前的競爭態勢與獲利水準。" },
+  { q:"台灣面板廠面對結構困境的主要策略是什麼？", opts:["大幅降價搶市","退出消費面板，轉向高附加價值利基市場","合併所有競爭者","遊說政府禁止進口"], ans:1, exp:"台灣面板廠選擇定位策略，退出紅海轉向車用、醫療等利基市場。" },
+  { q:"Jacobides 的「建築優勢」核心概念是什麼？", opts:["建造更大的工廠","透過塑造產業結構來獲取超額利潤","設計更好的產品","降低人事成本"], ans:1, exp:"建築優勢指企業主動塑造產業價值鏈結構，控制瓶頸以獲取利潤。" },
+  { q:"Google 開發 Android 的策略目的是什麼？", opts:["銷售手機","消除行動作業系統環節的瓶頸","取代 Apple","進入硬體市場"], ans:1, exp:"Google 開發 Android 是為了防止他人控制行動作業系統這個瓶頸。" },
+  { q:"鐵礦石三巨頭（Vale, Rio Tinto, BHP）的合併策略屬於什麼類型？", opts:["定位策略","改變產業結構——提高集中度","垂直整合","技術創新"], ans:1, exp:"透過合併提高供應商集中度，增強對鋼鐵廠客戶的議價力。" },
+  { q:"以下何者是 Apple iTunes 建立瓶頸的方式？", opts:["開放原始碼","透過 DRM 鎖定消費者，使音樂檔案不相容其他格式","降低售價","與所有競爭者合作"], ans:1, exp:"Apple 的 DRM 策略使消費者被鎖定在 iTunes 生態系中。" },
+  { q:"IKEA 重新定義角色的創新是什麼？", opts:["自行製造所有產品","將傢俱組裝責任從製造商轉移至消費者","提供免費送貨","只銷售高端傢俱"], ans:1, exp:"IKEA 讓消費者自行組裝，重新定義了產業中各方的角色。" },
+  { q:"目前獲利率為何不是預測未來的好指標？", opts:["因為會計準則經常變動","因為產業結構會改變，使競爭與獲利發生根本變化","因為通貨膨脹","因為匯率波動"], ans:1, exp:"產業結構持續演變，導致競爭強度與獲利水準發生根本性變化。" }
+],
+
+// M6
+m6_nav:"6. 關鍵成功因素",
+m6_title:"關鍵成功因素（KSF）辨識",
+m6_p1:"在理解產業如何決定整體獲利水準之後，進一步的問題是：在同一產業內，什麼因素決定了個別企業的優劣表現？這就是關鍵成功因素（Key Success Factors, KSF）的辨識。",
+m6_p2:"「作為面對不熟悉產業的顧問，我總是先問專家：『這個產業成功的秘訣是什麼？』……透過假設的建立與驗證，策略家往往能快速切入問題的核心。」——大前研一（Kenichi Ohmae）",
+m6_p3:"辨識 KSF 的方法很直觀：回答兩個問題——(1) 顧客要什麼？(2) 企業如何在競爭中存活？第一個問題需要深入分析需求面（顧客是誰、需要什麼、如何選擇）；第二個問題需要分析競爭面（競爭的主要維度、強度、如何取得優勢）。KSF 也可透過獲利模型拆解法來辨識，例如航空業可將營運利潤拆解為收益率、載客率與單位成本三個驅動因子。",
+m6_cards:[
+  { title:"微個案：全聯福利中心的 KSF", desc:"全聯從軍公教福利中心轉型為全台最大超市，其關鍵成功因素的辨識完美呼應了 Grant 的分析框架。顧客需求面：台灣消費者最重視的是「低價」與「便利位置」，其次是生鮮品質與產品齊全度。競爭存活面：超市業競爭激烈且利潤微薄，成本控制是生死關鍵。因此全聯的 KSF 包括：(1) 營運效率——極簡裝潢、精實人力配置，將成本壓至最低；(2) 採購規模——逾千家門市帶來的採購議價力；(3) 展店密度——深入社區的便利性（超越傳統超市但不與便利商店直接競爭）；(4) 自有品牌——提升毛利的同時提供消費者低價選項。" },
+  { title:"獲利模型拆解：航空業", desc:"航空業的營運利潤可拆解為：利潤/ASM = (收入/RPM) × (RPM/ASM) - (費用/ASM)。其中收入/RPM（收益率）取決於航線競爭強度與收益管理能力；RPM/ASM（載客率）取決於票價競爭力與路線規劃效率；費用/ASM（單位成本）取決於薪資水準、燃油效率與員工生產力。這種拆解讓管理者能精確辨識出影響獲利的關鍵驅動因子。" }
+],
+m6_terms:[
+  { front:"關鍵成功因素 KSF", back:"Key Success Factors：在特定產業中，影響企業能否超越對手的關鍵因素。由需求分析（顧客要什麼）與競爭分析（如何存活）雙軸辨識。" },
+  { front:"收益率 Yield", back:"航空業的每收入旅客英里收入（Revenue/RPM），反映票價水準與收益管理效能。" },
+  { front:"載客率 Load Factor", back:"RPM/ASM，即實際載客英里數佔可用座位英里數的比率，衡量座位利用效率。" }
+],
+m6_q:[
+  { q:"辨識 KSF 需回答的兩個核心問題是什麼？", opts:["成本多少？利潤多少？","顧客要什麼？如何在競爭中存活？","市場多大？成長多快？","技術是否先進？品牌是否知名？"], ans:1, exp:"KSF 辨識的雙軸：需求面（顧客要什麼）與競爭面（如何存活）。" },
+  { q:"全聯福利中心最核心的 KSF 是什麼？", opts:["奢華裝潢","高薪吸引人才","營運效率與採購規模","技術創新"], ans:2, exp:"全聯的成功建立在極致的營運效率（精實成本）與千店規模的採購議價力。" },
+  { q:"航空業獲利模型中，載客率（Load Factor）的公式是什麼？", opts:["Revenue/RPM","RPM/ASM","Expenses/ASM","Profit/Revenue"], ans:1, exp:"載客率 = RPM（收入旅客英里）/ ASM（可用座位英里）。" },
+  { q:"大前研一建議顧問面對不熟悉產業時應先做什麼？", opts:["立刻進行財務分析","詢問專家：這個產業成功的秘訣是什麼？","先讀完所有學術論文","直接提出解決方案"], ans:1, exp:"大前研一建議先從詢問業界專家開始，快速建立假設再驗證。" },
+  { q:"為什麼 KSF 不代表企業應採取相同策略？", opts:["因為 KSF 不重要","因為即使共享相同 KSF，各企業可採取獨特的策略來利用它們","因為每個產業的 KSF 都不同","因為策略不影響績效"], ans:1, exp:"相同的 KSF 可以透過不同策略來實踐，如 Zara 與 H&M 在時尚業的差異化路徑。" },
+  { q:"超市產業中，「便利位置」屬於哪一面的分析？", opts:["競爭面","需求面","供應面","法規面"], ans:1, exp:"便利位置回應的是「顧客要什麼」，屬於需求面分析。" },
+  { q:"航空業中，哪個因素對單位成本影響最大？", opts:["機場使用費","員工薪資與生產力","餐飲品質","廣告支出"], ans:1, exp:"薪資與福利是航空業最大的成本項目，員工生產力直接影響單位成本。" },
+  { q:"獲利模型拆解法的主要價值是什麼？", opts:["讓財報更好看","精確辨識影響獲利的關鍵驅動因子","取代五力分析","預測股價"], ans:1, exp:"獲利模型拆解讓管理者能精確辨識並管理影響獲利的各個驅動因子。" }
+],
+
+// M7 Resources
+m7_nav:"7. 外部資源",
+m7_title:"外部學習資源",
+m7_desc:"精選的產業分析相關學術資源、影音教材與分析報告",
+
+// M8 Lab
+mlab_nav:"8. 互動實驗室",
+mlab_title:"互動實驗室",
+mlab_desc:"透過互動工具深化對產業分析概念的理解——調整參數、觀察變化、建立直覺",
+
+// Footer
+date:"Version 2026.03.15",
+copyright:"For Educational Use Only",
+architect_label:"Architect:",
+architect_name:"Prof. Shihmin Lo",
+architect_url:"https://www.ibs.ncnu.edu.tw/index.php/faculty/tenured-professor/299-smlo"
+},
+
+en: {
+title:"Industry Analysis: External Environment & Structure", subtitle:"SMMC · Interactive Learning Series",
+nav_modules:"Module Menu", nav_prev:"Previous", nav_next:"Next",
+key_terms:"Key Terms", flip_prompt:"Click to flip", audio_read:"Audio Guide",
+quiz_title:"Module Quiz (Random 4 Questions)",
+submit:"Submit", retry:"Retry",
+score:"Score", correct:"Correct", incorrect:"Incorrect", explanation:"Explanation",
+analytics_title:"Learning Analytics", analytics_desc:"Track your learning progress, interactions, and quiz performance",
+analytics_form_title:"Student Information",
+analytics_group:"Group", analytics_dept:"Department",
+analytics_dept_ph:"e.g., IBS3", analytics_id:"Student ID", analytics_id_ph:"e.g., 112212099",
+analytics_name:"Name", analytics_name_ph:"e.g., Jimmy Lo",
+analytics_export_csv:"Export CSV Record",
+analytics_fill_required:"Please fill in all fields to unlock export",
+group_options:["G1","G2","G3","G4","G5","G6","Others"],
+analytics_total_time:"Total Time", analytics_total_clicks:"Total Clicks",
+analytics_overall_acc:"Overall Quiz Accuracy",
+analytics_module:"Module", analytics_time:"Time Spent",
+analytics_clicks:"Clicks", analytics_acc:"Accuracy",
+analytics_correct_ans_total:"Correct / Answered / Total",
+analytics_no_data:"No Data", analytics_sec:"s", analytics_times:"x",
+
+m0_nav:"0. Overview",
+m0_title:"Foundations & Practice of Industry Analysis",
+m0_intro:"This course systematically explores the theoretical tools and practical applications of industry environment analysis, based on Grant's Chapter 3 and Prof. Lo's lecture notes. From macro-environment to industry level, master Porter's Five Forces, the SCP paradigm, and industry structure theory to forecast profitability and develop competitive strategies.",
+m0_why:"Why Does Industry Analysis Matter?",
+m0_why_desc:"Warren Buffett once said: 'When a management with a reputation for brilliance tackles a business with a reputation for poor fundamental economics, it is the reputation of the business that remains intact.' Industry structure determines competitive intensity and profitability—it is the starting point of strategy analysis.",
+m0_stats:[
+  { val:"5", label:"Competitive Forces" },
+  { val:"6", label:"Learning Modules" },
+  { val:"48", label:"Quiz Questions" },
+  { val:"4+", label:"Interactive Labs" }
+],
+m0_modules:[
+  { num:"01", title:"From Macro Environment to Industry", desc:"PESTEL → Industry environment, defining boundaries" },
+  { num:"02", title:"Economic Foundations of Industry Structure", desc:"SCP paradigm, market structure spectrum, concentration metrics" },
+  { num:"03", title:"Porter's Five Forces Framework", desc:"Systematic analysis of five competitive forces" },
+  { num:"04", title:"Entry Barriers & Industry Rivalry", desc:"Seven entry barriers, exit barriers, cost structure dynamics" },
+  { num:"05", title:"Profitability Forecasting & Strategy", desc:"Changing structure, positioning, architectural advantage" },
+  { num:"06", title:"Identifying Key Success Factors", desc:"Demand & competition dual-axis KSF identification" }
+],
+m0_start:"Start Learning →",
+
+m1_nav:"1. Env→Industry",
+m1_title:"From Macro Environment to Industry Analysis",
+m1_p1:"A firm's external environment encompasses countless influences. PESTEL analysis (Political, Economic, Social, Technological, Ecological, Legal) provides a macro-level scanning framework, but the core driver of decisions and performance is the 'industry environment'—formed by relationships with customers, suppliers, and competitors.",
+m1_p2:"'To make a profit, a firm must create value for customers. Hence, it must understand its customers, manage supplier relationships, and comprehend competition. These three sets of relationships form the core of the firm's industry environment.' —Robert M. Grant",
+m1_p3:"Industry definitions are closely related to but distinct from markets: economists define an 'industry' as a group of firms supplying a market. Industry analysis examines competition in both product and factor markets. The key question is: how to draw industry boundaries? The answer depends on demand-side substitutability (will consumers switch?) and supply-side substitutability (can producers switch?).",
+m1_cards:[
+  { title:"Mini Case: Taiwan Telecom Industry Boundaries", desc:"Taiwan's telecom market has long been dominated by three major operators—Chunghwa Telecom, Taiwan Mobile, and Far EasTone—a classic oligopoly. After the 2023 mergers (Taiwan Star into Taiwan Mobile, APT into Far EasTone), the market became even more concentrated. How to define the industry boundary? If only mobile communications, the three are direct rivals; if broadband, fixed-line and OTT streaming are included, the competitive landscape expands significantly. This case illustrates Grant's principle that boundary definition depends on the purpose of analysis." },
+  { title:"Industry vs. Market vs. Sector", desc:"A sector is the broadest classification (e.g., 'computer sector'); an industry focuses on firms supplying substitute or complementary products; a market centers on consumers, including product and factor markets. Prof. Lo's lecture notes use the computer industry as an example, distinguishing component, hardware, and software sub-industries, further broken into market segments (notebooks, desktops, servers)." }
+],
+m1_terms:[
+  { front:"PESTEL Analysis", back:"Macro-environment scanning tool: Political, Economic, Social, Technological, Ecological, Legal factors affecting the business environment." },
+  { front:"Industry", back:"A group of firms that supply (produce or provide) substitute or complementary products/services. Differs from 'market' by taking the production-side perspective." },
+  { front:"Substitutability", back:"The key principle for defining industry boundaries: demand-side (consumer willingness to switch) and supply-side (producer ability to switch production)." }
+],
+m1_q:[
+  { q:"What do the two 'E's in PESTEL stand for?", opts:["Economic & Ecological","Education & Environment","Economic & Education","Ecological & Ethical"], ans:0, exp:"The two E's in PESTEL are Economic and Ecological." },
+  { q:"According to Grant, which three relationships form the core of a firm's industry environment?", opts:["Government, media, competitors","Customers, suppliers, competitors","Shareholders, employees, customers","Technology, capital, talent"], ans:1, exp:"Grant identifies customers, suppliers, and competitors as the three core relationships." },
+  { q:"How do economists define an 'industry'?", opts:["A collection of consumers","A group of firms supplying a market","A government-regulated sector","All publicly listed companies"], ans:1, exp:"Economists define an industry as a group of firms that supplies a market." },
+  { q:"What is the core principle for defining industry boundaries?", opts:["Government classification standards","SIC industry codes","Demand-side and supply-side substitutability","Company size"], ans:2, exp:"Industry boundaries depend on consumer switching willingness (demand) and producer switching ability (supply)." },
+  { q:"After 2023 mergers, Taiwan's telecom market formed what structure?", opts:["Perfect competition","Monopolistic competition","Three-firm oligopoly","Monopoly"], ans:2, exp:"After mergers, three major operators formed a concentrated oligopoly." },
+  { q:"Which of the following is NOT an external environment classification method mentioned by Grant?", opts:["PEST analysis","Five forces analysis","OT in SWOT analysis","Value chain analysis"], ans:3, exp:"Value chain analysis is an internal analysis tool, not external environment classification." },
+  { q:"What is the main difference between 'Industry' and 'Market'?", opts:["They are identical","Industry takes a production-side view, Market takes a consumption-side view","Industry is smaller than Market","Industry only covers manufacturing"], ans:1, exp:"Industry focuses on the supply side (group of firms), while Market encompasses the transaction relationship between supply and demand." },
+  { q:"What does supply-side substitutability mean?", opts:["Consumers willing to buy substitutes","Producers able to switch production to different products","Suppliers having bargaining power","Government restrictions on entry"], ans:1, exp:"Supply-side substitutability refers to producers' ability to use existing facilities and channels to supply different products." }
+],
+
+m2_nav:"2. Econ. Foundations",
+m2_title:"Economic Foundations of Industry Structure",
+m2_p1:"The theoretical foundation of industry analysis comes from Industrial Organization (IO) economics, centered on the Structure-Conduct-Performance (SCP) paradigm. SCP posits that basic conditions (demand and supply characteristics) determine market structure, structure influences firm conduct, and conduct ultimately determines industry performance.",
+m2_p2:"'In a monopoly, a single firm can appropriate the full value it creates as profit; under perfect competition, the rate of profit falls to a level that just covers firms' cost of capital. In the real world, most industries fall between these two extremes.' —Grant",
+m2_p3:"The market structure spectrum ranges from perfect competition (many firms, no barriers, homogeneous products) to monopoly (one firm, high barriers). Oligopoly is the most common real-world structure. Key concentration measures include CR4 (combined market share of top 4 firms), HHI (Herfindahl-Hirschman Index: sum of squared market shares), and the Lerner Index (price-cost markup ratio).",
+m2_cards:[
+  { title:"Mini Case: Taiwan Semiconductor's Oligopoly", desc:"The global foundry market exhibits highly concentrated oligopoly structure. TSMC commands ~60% global market share, Samsung ~12%, UMC ~6%. By HHI, TSMC alone contributes 3,600 points (60²), far exceeding the 2,500 'highly concentrated' threshold. This structure stems from extreme entry barriers: advanced process (sub-3nm) development costs exceeding $20 billion, thousands of patents, and decades of accumulated process knowledge (learning curve economies). TSMC's 'pure-play foundry' model creates customer trust, its priority access to ASML EUV lithography machines, and global fab expansion (Arizona, Kumamoto) continuously reinforce its near-monopoly position." },
+  { title:"SCP and Porter's Five Forces Relationship", desc:"The SCP paradigm provides the economic theoretical foundation for industry analysis; Porter's Five Forces translates it into a practical strategy tool. SCP's 'Structure' maps to Five Forces' structural characteristics (concentration, barriers); 'Conduct' maps to strategic choices (pricing, differentiation, collusion); 'Performance' corresponds to industry profitability. Government policy (regulation, subsidies, antitrust) is an exogenous force affecting all SCP levels." }
+],
+m2_terms:[
+  { front:"SCP Paradigm", back:"Structure-Conduct-Performance. Core IO economics framework: Basic Conditions → Structure → Conduct → Performance, with bidirectional interactions across levels." },
+  { front:"HHI (Herfindahl-Hirschman Index)", back:"HHI = Σsi². <1,500 = low concentration; 1,500-2,500 = moderate; >2,500 = highly concentrated. Used by US DOJ to review mergers." },
+  { front:"Lerner Index", back:"L = (P - MC) / P = 1/(-ε). Measures market power; L=0 under perfect competition, L>0 under monopoly." }
+],
+m2_q:[
+  { q:"What do S, C, P stand for in the SCP paradigm?", opts:["Strategy, Competition, Profit","Structure, Conduct, Performance","Supply, Cost, Price","Strength, Capability, Position"], ans:1, exp:"SCP = Structure, Conduct, Performance." },
+  { q:"At what HHI level is a market considered 'highly concentrated'?", opts:["1,000","1,500","2,500","5,000"], ans:2, exp:"US DOJ standard: HHI > 2,500 indicates a highly concentrated market." },
+  { q:"Which is NOT a characteristic of perfect competition?", opts:["Many buyers and sellers","Homogeneous products","No entry/exit barriers","Highly differentiated products"], ans:3, exp:"Perfect competition features homogeneous (not differentiated) products." },
+  { q:"What is TSMC's approximate global foundry market share?", opts:["30%","45%","60%","80%"], ans:2, exp:"TSMC holds approximately 60% of global foundry market share." },
+  { q:"What is the Lerner Index value under perfect competition?", opts:["0","0.5","1","Indeterminate"], ans:0, exp:"Under perfect competition, P = MC, so L = (P-MC)/P = 0." },
+  { q:"What does CR4 represent?", opts:["Top 4 buyers' purchasing ratio","Combined market share of top 4 firms","Four competitive forces","Four industry segments"], ans:1, exp:"CR4 = Sum of market shares of the top four sellers." },
+  { q:"What is the main characteristic of an oligopolistic market?", opts:["Countless small firms","Single firm monopoly","A few large firms dominating","Completely homogeneous products"], ans:2, exp:"Oligopoly means a few large firms dominate the market." },
+  { q:"In SCP, which level involves government regulation?", opts:["Only Structure","Only Conduct","Only Performance","Across all levels"], ans:3, exp:"Government policy can affect every level of SCP (Structure, Conduct, and Performance)." }
+],
+
+m3_nav:"3. Five Forces",
+m3_title:"Porter's Five Forces Framework",
+m3_p1:"Michael Porter's Five Forces is the most widely used framework for industry analysis. It examines competitive intensity and profit potential from five angles: three 'horizontal' sources (substitutes, entrants, existing rivals) and two 'vertical' bargaining forces (suppliers, buyers).",
+m3_p2:"'Industry profitability is neither random nor the result of entirely industry-specific influences: it is determined by the systematic influences of the industry's structure.' —Grant",
+m3_p3:"Substitute threat depends on buyers' propensity to substitute and the relative price-performance of alternatives. Entry threat is governed by the height of entry barriers. Rivalry intensity among existing competitors is shaped by concentration, differentiation, excess capacity, and exit barriers. Buyer and supplier power depend on their respective concentration, information, and vertical integration capabilities.",
+m3_cards:[
+  { title:"Mini Case: Taiwan Convenience Store Five Forces", desc:"Taiwan has the world's highest convenience store density (~1 per 1,500 people). 7-Eleven (Uni-President) and FamilyMart form a duopoly with combined share >70%. Five Forces: (1) Rivalry—highly concentrated but intense, focusing on non-price competition (fresh food innovation, loyalty programs, cross-industry partnerships); (2) Entry threat—Low. Dense store networks, supply chain integration, and brand loyalty create high barriers; (3) Substitute threat—Medium. Supermarkets (PX Mart), e-commerce (momo) offer alternatives; (4) Supplier power—Low. Large-scale purchasing and high private-label share; (5) Buyer power—Low. Individual purchase amounts are small, but convenience creates stickiness. Profitability insight: High concentration plus high entry barriers enable the duopoly to maintain stable profits." },
+  { title:"Structural Determinants of Each Force", desc:"Each competitive force is driven by specific structural variables. 'Substitute threat' depends on buyers' propensity to substitute and relative price-performance; 'Entry threat' depends on capital requirements, scale economies, brand loyalty; 'Rivalry' on concentration, differentiation, exit barriers; 'Buyer power' on buyer concentration, information, vertical integration ability; 'Supplier power' mirrors buyer power factors." }
+],
+m3_terms:[
+  { front:"Five Forces Analysis", back:"Porter's framework: five forces determine industry profitability—substitutes, new entrants, existing rivalry, buyer power, supplier power." },
+  { front:"Substitute Threat", back:"When substitutes offer superior price-performance, consumers switch more readily, constraining industry pricing power." },
+  { front:"Bargaining Power", back:"The ability of buyers or suppliers to influence prices and terms through the credible threat of refusing to deal, determined by concentration, information, and alternatives." }
+],
+m3_q:[
+  { q:"What are the three 'horizontal' competition sources in Porter's Five Forces?", opts:["Suppliers, buyers, government","Substitutes, new entrants, existing rivals","Technology, talent, capital","Upstream, midstream, downstream"], ans:1, exp:"Three horizontal sources: substitutes, new entrants, and existing rivals." },
+  { q:"What primarily determines the strength of substitute threats?", opts:["Substitute brand recognition","Buyers' propensity to substitute and relative price-performance","Number of suppliers","Government regulation"], ans:1, exp:"Substitute threat depends on consumer switching willingness and relative price-performance." },
+  { q:"What is the main non-price competition method in Taiwan's convenience store industry?", opts:["Deep price cuts","Fresh food innovation and loyalty programs","Expanding store size","Raising product prices"], ans:1, exp:"Taiwan convenience stores compete through fresh food R&D, loyalty marketing, and cross-industry partnerships." },
+  { q:"What are the 'vertical' competitive forces in Five Forces?", opts:["Substitutes and new entrants","Supplier bargaining power and buyer bargaining power","Existing and potential rivals","Upstream and downstream competition"], ans:1, exp:"The two vertical forces are supplier bargaining power and buyer bargaining power." },
+  { q:"In a market with high buyer concentration, what is the impact on the supplying industry?", opts:["Higher industry profits","Lower prices and profits for the supplying industry","Increased entry barriers","Reduced substitute threats"], ans:1, exp:"More concentrated buyers have stronger bargaining power, pushing down prices and profits." },
+  { q:"What is the primary purpose of Five Forces analysis?", opts:["Analyze internal resources","Evaluate employee performance","Determine industry profit potential","Forecast macroeconomic trends"], ans:2, exp:"Five Forces analysis determines how industry structure drives competitive intensity and profit potential." },
+  { q:"Which of the following increases supplier bargaining power?", opts:["Many suppliers","Products easily substituted","Highly concentrated suppliers with unique technology","Strong buyer vertical integration"], ans:2, exp:"More concentrated suppliers with unique, hard-to-substitute products have stronger bargaining power." },
+  { q:"Where was Porter's Five Forces analysis first published?", opts:["The Wealth of Nations","Harvard Business Review","Principles of Economics","Academy of Management Journal"], ans:1, exp:"Porter's Five Forces was published in Harvard Business Review in 1979." }
+],
+
+m4_nav:"4. Entry Barriers",
+m4_title:"Entry Barriers & Industry Rivalry",
+m4_p1:"Entry barriers are disadvantages that new entrants face relative to established firms—the higher the barriers, the more protected industry profits are. Grant identifies seven major sources: capital requirements, economies of scale, absolute cost advantages, product differentiation, access to distribution, governmental/legal barriers, and retaliation expectations.",
+m4_p2:"'Building entry barriers is a vital strategy for preserving high profitability in the long run. A primary goal of the American Medical Association has been to maintain the incomes of its members by controlling the numbers of doctors trained.' —Grant",
+m4_p3:"Exit barriers also affect industry profitability. When assets are durable and specialized, employees have job protection, and exit involves high costs, excess capacity cannot leave the industry even when demand declines, continuously depressing prices and profits. Cost structure (ratio of fixed to variable costs) is also crucial: when fixed costs are high relative to variable costs, firms accept business at any price above variable cost, triggering price wars.",
+m4_cards:[
+  { title:"Mini Case: How TSMC Builds Entry Barriers", desc:"TSMC's moat is built from multiple overlapping entry barriers. First, staggering capital requirements: a single advanced fab costs over $20 billion, with 2024 capex reaching $32 billion. Second, scale economies and learning curves: decades of accumulated process knowledge yield superior yields, where each percentage point difference can mean billions of dollars. Third, absolute cost advantage: as ASML's largest customer, TSMC gets priority access to cutting-edge EUV lithography machines. Fourth, vertical integration: investing in upstream equipment makers (ASML), developing advanced packaging (CoWoS, InFO). Finally, the 'pure-play foundry' trust barrier: customers don't worry about IP leakage—an advantage competitors with their own branded products (like Samsung) cannot replicate." },
+  { title:"Contestable Markets Theory", desc:"If no sunk costs exist in an industry, even with few firms, profits tend toward competitive levels. Potential entrants can engage in 'hit-and-run' entry: entering quickly when incumbents raise prices, taking profits, then exiting. However, most industries have sunk costs, making entry barriers non-zero. This theory reminds us: the threat of entry alone may constrain incumbent pricing power." }
+],
+m4_terms:[
+  { front:"Barriers to Entry", back:"Disadvantages new entrants face relative to established firms. Sources include capital requirements, scale economies, brand loyalty, regulation, and retaliation expectations." },
+  { front:"Exit Barriers", back:"Factors preventing capacity from leaving an industry: asset specificity, employee protection, environmental cleanup costs. High exit barriers worsen excess capacity problems." },
+  { front:"Sunk Costs", back:"Costs that cannot be recovered upon exit. Higher sunk costs reduce industry contestability." }
+],
+m4_q:[
+  { q:"Which is NOT among Grant's seven major entry barriers?", opts:["Capital requirements","Economies of scale","Employee satisfaction","Governmental/legal barriers"], ans:2, exp:"The seven barriers: capital requirements, scale economies, absolute cost advantages, product differentiation, distribution access, legal barriers, retaliation." },
+  { q:"How much does a single TSMC advanced fab cost approximately?", opts:["$500 million","$2 billion","Over $20 billion","$1 trillion"], ans:2, exp:"A single TSMC advanced process fab costs over $20 billion." },
+  { q:"What is the key condition for a contestable market?", opts:["Many firms","No sunk costs","Highly differentiated products","Strict government regulation"], ans:1, exp:"The core condition for contestability is the absence of sunk costs." },
+  { q:"What happens in industries with high exit barriers when demand declines?", opts:["Firms exit quickly","Excess capacity continues to depress prices","Profits improve immediately","New entrants flood in"], ans:1, exp:"High exit barriers prevent capacity from leaving, sustaining excess capacity and depressed prices." },
+  { q:"What characterizes industries with high fixed-cost ratios during recessions?", opts:["Stable prices","Extreme profit volatility","Low exit barriers","More entrants"], ans:1, exp:"High fixed-cost ratios mean revenue fluctuations are amplified into larger profit swings." },
+  { q:"How does TSMC's 'pure-play' positioning create an entry barrier?", opts:["Reduces cost","Builds customer trust through IP protection","Increases capacity","Raises prices"], ans:1, exp:"Pure-play foundry model ensures customers don't fear IP leakage—a trust advantage competitors can't easily replicate." },
+  { q:"Which product category does NOT exhibit high brand loyalty?", opts:["Cosmetics","Pet food","Commodities (e.g., iron ore)","Toothpaste"], ans:2, exp:"Commodities have virtually no brand differentiation and very low loyalty." },
+  { q:"What is the primary source of airline industry profit volatility?", opts:["High differentiation","High fixed-cost ratio plus excess capacity","Extremely high entry barriers","Weak supplier power"], ans:1, exp:"Airlines have high fixed costs and near-zero marginal costs for empty seats, leading to severe price wars when capacity is excess." }
+],
+
+m5_nav:"5. Profit & Strategy",
+m5_title:"Profitability Forecasting & Strategy Application",
+m5_p1:"Industry analysis is not just about explaining the past—it's about predicting the future. Forecasting profitability follows three steps: (1) analyze how current structure produces current competition and profitability; (2) identify trends changing the structure; (3) assess how these structural changes will affect the five forces and profitability.",
+m5_p2:"'Current profitability is a poor indicator of future profitability—newspapers, solar panels, and investment banking have suffered massive profitability declines; in other industries such as chemicals and food processing, profitability has revived.' —Grant",
+m5_p3:"Firms can leverage industry analysis for strategy in two ways. First, alter industry structure: increase concentration through mergers (e.g., iron ore three giants), build entry barriers (e.g., medical associations controlling doctor supply), or create bottlenecks (e.g., Apple's iTunes DRM locking in consumers). Second, positioning strategy: find positions where competitive forces are weakest. Jacobides' 'architectural advantage' goes further, encouraging firms to actively shape value chain roles and profit distribution.",
+m5_cards:[
+  { title:"Mini Case: Taiwan Display Industry's Structural Collapse & Pivot", desc:"Taiwan's display panel industry was once worth hundreds of billions but structural deterioration led to sustained losses. AUO and Innolux's predicament can be fully explained by Five Forces: (1) Intense rivalry—price wars with Samsung, LG, BOE; (2) Excess capacity—driven by Chinese government subsidies; (3) Strong buyer power—Apple, Samsung are highly concentrated; (4) Substitutes—OLED, Micro LED threats. Facing this structural crisis, Taiwan panel makers chose positioning strategy: exiting the consumer panel red ocean, pivoting to automotive displays, medical monitors, and gaming screens—high-value niches that avoid the fiercest competitive forces." },
+  { title:"Architectural Advantage", desc:"Jacobides encourages firms to view the entire industry ecosystem, identifying 'bottlenecks'—scarce, controllable activity nodes. Three approaches: (1) Create your own bottleneck (Apple's iTunes DRM); (2) Relieve bottlenecks elsewhere (Google developed Android to prevent others from controlling mobile OS); (3) Redefine roles (IKEA transferred furniture assembly from manufacturers to consumers)." }
+],
+m5_terms:[
+  { front:"Positioning Strategy", back:"Finding market segments or strategic positions within an industry where competitive forces are weakest, enabling higher profits." },
+  { front:"Architectural Advantage", back:"Jacobides' concept: firms shape industry value chain structure (creating/relieving bottlenecks, redefining roles) to capture excess profits." },
+  { front:"Bottleneck", back:"A scarce, controllable key node in the value chain. Firms controlling bottlenecks can capture excess profits (e.g., TSMC in advanced foundry)." }
+],
+m5_q:[
+  { q:"What is the first step in forecasting industry profitability?", opts:["Identify structural trends","Analyze how current structure leads to current competition and profits","Assess structural changes' impact on five forces","Calculate HHI"], ans:1, exp:"Step 1: Analyze how the industry's current structure produces current competition and profitability." },
+  { q:"What was Taiwan panel makers' main strategy facing structural crisis?", opts:["Aggressive price cuts","Exit consumer panels, pivot to high-value niches","Merge all competitors","Lobby government to ban imports"], ans:1, exp:"Taiwan panel makers chose positioning strategy: exiting the red ocean for high-value niche markets." },
+  { q:"What is the core concept of Jacobides' 'architectural advantage'?", opts:["Building bigger factories","Shaping industry structure to capture excess profits","Designing better products","Reducing personnel costs"], ans:1, exp:"Architectural advantage means actively shaping value chain structure to control bottlenecks." },
+  { q:"What was Google's strategic purpose in developing Android?", opts:["Selling phones","Relieving the mobile OS bottleneck","Replacing Apple","Entering hardware"], ans:1, exp:"Google developed Android to prevent others from controlling the mobile OS bottleneck." },
+  { q:"The iron ore three giants' merger strategy is what type?", opts:["Positioning","Altering industry structure—increasing concentration","Vertical integration","Technology innovation"], ans:1, exp:"Mergers increased supplier concentration, strengthening bargaining power against steel customers." },
+  { q:"How did Apple create a bottleneck through iTunes?", opts:["Open source","DRM locked consumers into incompatible music files","Lower prices","Cooperate with all competitors"], ans:1, exp:"Apple's DRM strategy locked consumers into the iTunes ecosystem." },
+  { q:"What was IKEA's role-redefining innovation?", opts:["Manufacturing everything in-house","Transferring furniture assembly from manufacturers to consumers","Free delivery","Selling only high-end furniture"], ans:1, exp:"IKEA let consumers assemble furniture, redefining roles across the industry." },
+  { q:"Why is current profitability a poor predictor of the future?", opts:["Accounting standards change frequently","Industry structure evolves, causing fundamental changes in competition and profits","Inflation","Exchange rate fluctuations"], ans:1, exp:"Industry structure continuously evolves, causing fundamental shifts in competition and profitability." }
+],
+
+m6_nav:"6. KSF",
+m6_title:"Identifying Key Success Factors (KSF)",
+m6_p1:"After understanding how industry determines overall profitability, the next question is: within the same industry, what factors determine individual firm performance? This is Key Success Factor (KSF) identification.",
+m6_p2:"'As a consultant faced with an unfamiliar business, I make a point of first asking the specialists: What is the secret of success in this industry?... By first identifying probable key factors then screening them, the strategist can quickly penetrate to the core of a problem.' —Kenichi Ohmae",
+m6_p3:"KSF identification is intuitive: answer two questions—(1) What do customers want? (2) How does the firm survive competition? The first requires demand analysis (who are customers, what do they need, how do they choose); the second requires competition analysis (key dimensions, intensity, how to gain advantage). KSFs can also be identified through profitability modeling—e.g., airline operating profit can be decomposed into yield, load factor, and unit cost.",
+m6_cards:[
+  { title:"Mini Case: PX Mart's Key Success Factors", desc:"PX Mart transformed from a military welfare center into Taiwan's largest supermarket. Its KSFs perfectly illustrate Grant's framework. Demand side: Taiwan consumers prioritize 'low prices' and 'convenient location,' followed by fresh produce quality and product range. Competition survival: supermarket competition is fierce with thin margins—cost control is life or death. PX Mart's KSFs: (1) Operational efficiency—minimalist décor, lean staffing; (2) Purchasing scale—over 1,000 stores provide bargaining leverage; (3) Store density—deep community penetration; (4) Private labels—boost margins while offering consumers low-price options." },
+  { title:"Profitability Modeling: Airlines", desc:"Airline operating profit decomposes as: Profit/ASM = (Revenue/RPM) × (RPM/ASM) - (Expenses/ASM). Revenue/RPM (yield) depends on route competition and revenue management; RPM/ASM (load factor) on pricing competitiveness and route planning; Expenses/ASM (unit cost) on wages, fuel efficiency, and employee productivity. This decomposition lets managers precisely identify key profitability drivers." }
+],
+m6_terms:[
+  { front:"Key Success Factors (KSF)", back:"Factors within an industry that determine a firm's ability to outperform rivals. Identified through demand analysis (what customers want) and competition analysis (how to survive)." },
+  { front:"Yield", back:"Revenue per Revenue Passenger Mile (Revenue/RPM) in airlines, reflecting fare levels and revenue management effectiveness." },
+  { front:"Load Factor", back:"RPM/ASM—the ratio of actual revenue passenger miles to available seat miles, measuring seat utilization efficiency." }
+],
+m6_q:[
+  { q:"What two core questions must be answered to identify KSFs?", opts:["How much cost? How much profit?","What do customers want? How to survive competition?","How big is the market? How fast is growth?","Is technology advanced? Is the brand well-known?"], ans:1, exp:"KSF identification dual-axis: demand (what customers want) and competition (how to survive)." },
+  { q:"What is PX Mart's most core KSF?", opts:["Luxury décor","High salaries to attract talent","Operational efficiency and purchasing scale","Technology innovation"], ans:2, exp:"PX Mart's success is built on extreme operational efficiency (lean costs) and 1,000+ store purchasing leverage." },
+  { q:"What is the load factor formula in airline profitability modeling?", opts:["Revenue/RPM","RPM/ASM","Expenses/ASM","Profit/Revenue"], ans:1, exp:"Load Factor = RPM (Revenue Passenger Miles) / ASM (Available Seat Miles)." },
+  { q:"What does Ohmae suggest consultants do first when facing an unfamiliar industry?", opts:["Immediately conduct financial analysis","Ask experts: What is the secret of success?","Read all academic papers first","Directly propose solutions"], ans:1, exp:"Ohmae suggests starting by asking industry experts to quickly establish hypotheses for testing." },
+  { q:"Why don't shared KSFs mean firms should adopt identical strategies?", opts:["Because KSFs don't matter","Even with shared KSFs, firms can adopt unique strategies to exploit them","Each industry has different KSFs","Strategy doesn't affect performance"], ans:1, exp:"The same KSFs can be pursued through different strategies, as Zara and H&M demonstrate in fashion." },
+  { q:"In supermarkets, 'convenient location' belongs to which analysis dimension?", opts:["Competition","Demand","Supply","Regulation"], ans:1, exp:"Convenient location addresses 'what customers want'—demand-side analysis." },
+  { q:"Which factor has the largest impact on airline unit costs?", opts:["Airport fees","Employee wages and productivity","Catering quality","Advertising spend"], ans:1, exp:"Wages and benefits are airlines' largest cost item; employee productivity directly impacts unit costs." },
+  { q:"What is the main value of profitability model decomposition?", opts:["Makes financial reports look better","Precisely identifies key profitability drivers","Replaces Five Forces analysis","Predicts stock prices"], ans:1, exp:"Profitability decomposition lets managers precisely identify and manage key drivers of profitability." }
+],
+
+m7_nav:"7. Resources",
+m7_title:"External Learning Resources",
+m7_desc:"Curated academic resources, video materials, and analysis reports on industry analysis",
+
+mlab_nav:"8. Lab",
+mlab_title:"Interactive Laboratory",
+mlab_desc:"Deepen your understanding of industry analysis concepts through interactive tools—adjust parameters, observe changes, build intuition",
+
+date:"Version 2026.03.15",
+copyright:"For Educational Use Only",
+architect_label:"Architect:",
+architect_name:"Prof. Shihmin Lo",
+architect_url:"https://www.ibs.ncnu.edu.tw/index.php/faculty/tenured-professor/299-smlo"
+}
+};
+
+/* ===== Main App ===== */
+function App() {
+  const [lang, setLang] = useState('zh');
+  const [isDark, setIsDark] = useState(false);
+  const [module, setModule] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [ttsState, setTtsState] = useState('idle');
+  const [studentInfo, setStudentInfo] = useState({ group:'', dept:'', id:'', name:'' });
+  const [analytics, setAnalytics] = useState({
+    time: Array(TOTAL).fill(0), clicks: Array(TOTAL).fill(0),
+    quizCorrect: Array(TOTAL).fill(0), quizTotal: Array(TOTAL).fill(0)
+  });
+  const contentRef = useRef(null);
+  const menuRef = useRef(null);
+  const t = dict[lang];
+
+  useEffect(() => { document.documentElement.classList.toggle('dark', isDark); }, [isDark]);
+  useEffect(() => { const iv = setInterval(() => { setAnalytics(a => { const t2=[...a.time]; t2[module]++; return {...a, time:t2}; }); }, 1000); return () => clearInterval(iv); }, [module]);
+  useEffect(() => { window.scrollTo({top:0,behavior:'smooth'}); window.speechSynthesis?.cancel(); setTtsState('idle'); }, [module]);
+  useEffect(() => { if(!menuOpen) return; const h=e=>{if(menuRef.current&&!menuRef.current.contains(e.target))setMenuOpen(false);}; document.addEventListener('mousedown',h); return()=>document.removeEventListener('mousedown',h); }, [menuOpen]);
+
+  const handleClick = () => setAnalytics(a => { const c=[...a.clicks]; c[module]++; return {...a, clicks:c}; });
+  const handleQuizSubmit = (mId, correct, total) => setAnalytics(a => { const qc=[...a.quizCorrect]; const qt=[...a.quizTotal]; qc[mId]+=correct; qt[mId]+=total; return {...a, quizCorrect:qc, quizTotal:qt}; });
+
+  const handleTTS = (action) => {
+    if(!('speechSynthesis' in window)) return;
+    if(action==='stop'){window.speechSynthesis.cancel();setTtsState('idle');return;}
+    if(action==='pause'){window.speechSynthesis.pause();setTtsState('paused');return;}
+    if(action==='play'){
+      if(ttsState==='paused'){window.speechSynthesis.resume();setTtsState('playing');return;}
+      window.speechSynthesis.cancel();
+      const sep=lang==='zh'?'。 ':'. ';
+      let texts=[];
+      if(module===0){texts=[t.m0_title,t.m0_intro,t.m0_why,t.m0_why_desc,...(t.m0_stats||[]).map(s=>`${s.label}: ${s.val}`),...(t.m0_modules||[]).map(m=>`${m.title}. ${m.desc}`)].filter(Boolean);}
+      else if(module>=1&&module<=N){const mk=`m${module}`;texts=[t[`${mk}_title`],t[`${mk}_p1`],t[`${mk}_p2`],t[`${mk}_p3`],...(t[`${mk}_cards`]||[]).map(c=>`${c.title}. ${c.desc}`),...(t[`${mk}_terms`]||[]).flatMap(tm=>[tm.front,tm.back])].filter(Boolean);}
+      else if(module===N+1){texts=[t.m7_title,t.m7_desc].filter(Boolean);}
+      else if(module===N+2){texts=[t.mlab_title,t.mlab_desc].filter(Boolean);}
+      else{texts=[t.analytics_title,t.analytics_desc].filter(Boolean);}
+      const text=texts.join(sep);
+      const u=new SpeechSynthesisUtterance(text);u.rate=0.95;
+      const voices=window.speechSynthesis.getVoices();
+      if(lang==='zh'){const v=voices.find(v=>v.lang==='zh-TW'&&v.name.includes('Yating'))||voices.find(v=>v.lang==='zh-TW')||voices.find(v=>v.lang.startsWith('zh'));if(v)u.voice=v;u.lang='zh-TW';}
+      else{const v=voices.find(v=>v.lang==='en-GB'&&(v.name.includes('Male')||v.name.includes('Daniel')))||voices.find(v=>v.lang==='en-GB')||voices.find(v=>v.lang.startsWith('en'));if(v)u.voice=v;u.lang='en-GB';}
+      u.onend=()=>setTtsState('idle');u.onerror=()=>setTtsState('idle');
+      window.speechSynthesis.speak(u);setTtsState('playing');
+    }
+  };
+
+  const handleExportCSV = () => {
+    const bom='\uFEFF';
+    const mKeys=[...Array(N).keys()].map(i=>`m${i+1}_nav`);
+    let csv=bom+'Group,Dept,ID,Name,Module,Time(s),Clicks,Correct,Answered,Total\n';
+    mKeys.forEach((k,i)=>{
+      csv+=`${studentInfo.group},${studentInfo.dept},${studentInfo.id},${studentInfo.name},${t[k]},${analytics.time[i+1]},${analytics.clicks[i+1]},${analytics.quizCorrect[i+1]},${analytics.quizTotal[i+1]},8\n`;
+    });
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='learning_analytics.csv';a.click();
+  };
+
+  const modulesList = [
+    { id:0, title:t.m0_nav, icon:<IconBookOpen size={16}/> },
+    ...Array.from({length:N},(_,i)=>({ id:i+1, title:t[`m${i+1}_nav`], icon:[<IconGlobe size={16}/>,<IconCpu size={16}/>,<IconLayers size={16}/>,<IconFlag size={16}/>,<IconTrendingUp size={16}/>,<IconZap size={16}/>][i] })),
+    { id:N+1, title:t.m7_nav, icon:<IconGlobe size={16}/> },
+    { id:N+2, title:t.mlab_nav, icon:<IconZapLab size={16}/> },
+    { id:N+3, title:t.analytics_title, icon:<IconActivity size={16}/> },
+  ];
+
+  const H2 = ({children}) => <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-[#004030] dark:text-[#D8C3A5] border-b-2 border-[#D8C3A5] pb-4">{children}</h2>;
+
+  const renderNavBottom = () => (
+    <div className="mt-12 flex justify-between items-center pt-8 border-t border-slate-300 dark:border-slate-700">
+      <button onClick={()=>setModule(Math.max(0,module-1))} disabled={module===0} className="px-6 py-3 font-serif font-bold text-slate-500 hover:text-[#004030] dark:hover:text-[#D8C3A5] disabled:opacity-0 transition-colors flex items-center uppercase text-sm tracking-wider">← {t.nav_prev}</button>
+      <button onClick={()=>setModule(Math.min(TOTAL-1,module+1))} disabled={module===TOTAL-1} className="px-8 py-3 bg-[#004030] dark:bg-[#D8C3A5] text-white dark:text-[#004030] font-serif font-bold hover:bg-[#002b20] disabled:opacity-0 transition-colors flex items-center uppercase text-sm tracking-wider shadow-md">{t.nav_next} <IconArrowRight size={16} className="ml-2"/></button>
+    </div>
+  );
+
+  const renderModule = (mNum) => {
+    const mk = `m${mNum}`;
+    return (
+      <div className="space-y-6 text-base leading-relaxed text-slate-700 dark:text-slate-300 animate-fade-in">
+        <H2>{t[`${mk}_title`]}</H2>
+        <p>{t[`${mk}_p1`]}</p>
+        <p className="p-4 bg-slate-100 dark:bg-slate-800 rounded-lg italic font-serif text-slate-600 dark:text-slate-300">{t[`${mk}_p2`]}</p>
+        <p>{t[`${mk}_p3`]}</p>
+        <div className="grid md:grid-cols-2 gap-6">
+          {(t[`${mk}_cards`]||[]).map((c,i) => (
+            <div key={i} className="bg-white dark:bg-slate-800 p-5 rounded-xl border-l-4 border-[#004030] shadow-sm hover:shadow-md transition-shadow">
+              <h3 className="text-base font-bold font-serif text-[#004030] dark:text-[#D8C3A5] mb-2">{c.title}</h3>
+              <p className="text-sm leading-relaxed whitespace-pre-line">{c.desc}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-8"><h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4">{t.key_terms}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{(t[`${mk}_terms`]||[]).map((term,i) => <FlipCard key={i} front={term.front} back={term.back} t={t}/>)}</div>
+        </div>
+        <ModuleQuiz questions={t[`${mk}_q`]} t={t} moduleId={module} onQuizSubmit={handleQuizSubmit}/>
+        {renderNavBottom()}
+      </div>
+    );
+  };
+
+  const renderResources = () => {
+    const links = [
+      { label: lang==='zh'?'Porter 五力分析原始論文 (HBR)':'Porter Five Forces Original Paper (HBR)', url:'https://hbr.org/2008/01/the-five-competitive-forces-that-shape-strategy', desc: lang==='zh'?'Michael Porter 2008 年更新版，完整闡述五力分析的理論與應用。':'Michael Porter\'s 2008 updated article on the Five Forces framework.' },
+      { label: lang==='zh'?'Grant: Contemporary Strategy Analysis':'Grant: Contemporary Strategy Analysis', url:'https://www.wiley.com/en-us/Contemporary+Strategy+Analysis-p-9781119815235', desc: lang==='zh'?'本課程主要教科書，第三章為產業分析基礎。':'Main textbook for this course; Chapter 3 covers industry analysis fundamentals.' },
+    ];
+    const other = [
+      { icon:'🎬', cat: lang==='zh'?'影音教材':'Video Materials', items:[
+        { label: lang==='zh'?'Harvard Business School: Five Forces Explained':'HBS: Five Forces Explained', url:'https://www.youtube.com/watch?v=mYF2_FBCvXw', desc: lang==='zh'?'Porter 本人講解五力分析的經典影片。':'Porter himself explains the Five Forces framework.' },
+        { label: lang==='zh'?'台積電商業模式解析 (YouTube)':'TSMC Business Model Analysis', url:'https://www.youtube.com/results?search_query=TSMC+business+model+analysis', desc: lang==='zh'?'多部深度分析台積電護城河與產業結構的影片。':'Videos analyzing TSMC\'s moat and industry structure.' },
+      ]},
+      { icon:'📊', cat: lang==='zh'?'產業報告':'Industry Reports', items:[
+        { label: lang==='zh'?'PwC 電信業策略報告':'PwC Telecom Strategy Report', url:'https://www.pwc.tw/zh/publications/global-insights/strategic-choices-telecom-industry.html', desc: lang==='zh'?'PwC Strategy& 關於電信業結構轉變與策略選擇的深度分析。':'PwC Strategy& deep analysis on telecom structural transformation.' },
+        { label: lang==='zh'?'Deloitte 電信業資料分析應用':'Deloitte Telecom Data Analytics', url:'https://www2.deloitte.com/tw/tc/pages/risk/articles/newsletter-05-20.html', desc: lang==='zh'?'探討電信業如何運用資料分析因應產業結構變化。':'How telecom leverages data analytics amid structural changes.' },
+      ]},
+      { icon:'📚', cat: lang==='zh'?'學術資源':'Academic Resources', items:[
+        { label: lang==='zh'?'維基百科：五力分析':'Wikipedia: Five Forces', url:'https://zh.wikipedia.org/zh-tw/%E4%BA%94%E5%8A%9B%E5%88%86%E6%9E%90', desc: lang==='zh'?'五力分析的完整介紹與各力量指標說明。':'Complete overview of Five Forces with indicator descriptions.' },
+        { label: lang==='zh'?'台灣產業經濟服務網 (IEK)':'Taiwan IEK Industrial Economics', url:'https://www.moeaidb.gov.tw/', desc: lang==='zh'?'經濟部工業局產業資訊，提供台灣各產業結構數據。':'MOEA industrial data providing Taiwan industry structure statistics.' },
+      ]},
+    ];
+    return (
+      <div className="space-y-10 animate-fade-in">
+        <H2>{t.m7_title}</H2>
+        <p className="text-slate-500 dark:text-slate-400">{t.m7_desc}</p>
+        <div className="grid md:grid-cols-2 gap-3">{links.map((l,i)=><LinkCard key={i} {...l}/>)}</div>
+        {other.map((sec,si)=>(
+          <div key={si}>
+            <h3 className="flex items-center gap-2 text-base font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide mb-3"><span>{sec.icon}</span>{sec.cat}</h3>
+            <div className="grid md:grid-cols-2 gap-3">{sec.items.map((l,i)=><LinkCard key={i} {...l}/>)}</div>
+          </div>
+        ))}
+        <div className="bg-[#004030]/5 dark:bg-[#D8C3A5]/5 rounded-xl p-5 border border-[#004030]/20 dark:border-[#D8C3A5]/20">
+          <p className="text-sm text-slate-600 dark:text-slate-400">⚠️ {lang==='zh'?'以上連結僅供學術參考，內容版權歸原作者所有。連結有效性可能因時間而異。':'Links are for academic reference only. Content copyrights belong to original authors. Link validity may change over time.'}</p>
+        </div>
+        {renderNavBottom()}
+      </div>
+    );
+  };
+
+  const renderLab = () => (
+    <div className="space-y-8 animate-fade-in">
+      <H2>{t.mlab_title}</H2>
+      <p className="mt-4 text-slate-600 dark:text-slate-400">{t.mlab_desc}</p>
+      <FiveForcesDiagram lang={lang}/>
+      <div className="grid md:grid-cols-2 gap-6">
+        <HHICalculator lang={lang}/>
+        <BarrierSimulator lang={lang}/>
+      </div>
+      <ProfitabilityChart lang={lang}/>
+      <KSFAnalyzer lang={lang}/>
+      {renderNavBottom()}
+    </div>
+  );
+
+  const renderAnalytics = () => {
+    const totalTime = analytics.time.reduce((a,b)=>a+b,0);
+    const totalClicks = analytics.clicks.reduce((a,b)=>a+b,0);
+    const totalCorrect = analytics.quizCorrect.reduce((a,b)=>a+b,0);
+    const totalAnswered = analytics.quizTotal.reduce((a,b)=>a+b,0);
+    const overallAcc = totalAnswered>0?Math.round(totalCorrect/totalAnswered*100)+'%':t.analytics_no_data;
+    const canExport = studentInfo.group&&studentInfo.dept&&studentInfo.id&&studentInfo.name;
+    const mNavKeys = Array.from({length:N},(_,i)=>`m${i+1}_nav`);
+    return (
+      <div className="space-y-6 text-base leading-relaxed text-slate-700 dark:text-slate-300 animate-fade-in">
+        <H2>{t.analytics_title}</H2>
+        <p className="text-slate-500 dark:text-slate-400">{t.analytics_desc}</p>
+        <div className="grid grid-cols-3 gap-4">
+          {[{label:t.analytics_total_time,val:totalTime+t.analytics_sec},{label:t.analytics_total_clicks,val:totalClicks+t.analytics_times},{label:t.analytics_overall_acc,val:overallAcc}].map((s,i)=>(
+            <div key={i} className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 text-center shadow-sm">
+              <p className="text-2xl font-black font-serif text-[#004030] dark:text-[#D8C3A5]">{s.val}</p>
+              <p className="text-xs text-slate-500 mt-1">{s.label}</p>
+            </div>
+          ))}
+        </div>
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+          <table className="w-full text-sm"><thead><tr className="bg-[#004030] text-[#D8C3A5]">
+            <th className="text-left p-3">{t.analytics_module}</th><th className="text-center p-3">{t.analytics_time}</th><th className="text-center p-3">{t.analytics_clicks}</th><th className="text-center p-3">{t.analytics_acc}</th><th className="text-center p-3 hidden md:table-cell">{t.analytics_correct_ans_total}</th>
+          </tr></thead>
+          <tbody>{Array.from({length:N},(_,i)=>{
+            const acc=analytics.quizTotal[i+1]>0?Math.round(analytics.quizCorrect[i+1]/analytics.quizTotal[i+1]*100)+'%':t.analytics_no_data;
+            const ans=analytics.quizTotal[i+1]>0?`${analytics.quizCorrect[i+1]}/${analytics.quizTotal[i+1]}/8`:t.analytics_no_data;
+            return <tr key={i} className="border-t border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+              <td className="p-3 font-medium text-[#004030] dark:text-[#D8C3A5]">{t[mNavKeys[i]]}</td>
+              <td className="p-3 text-center">{analytics.time[i+1]}{t.analytics_sec}</td>
+              <td className="p-3 text-center">{analytics.clicks[i+1]}{t.analytics_times}</td>
+              <td className="p-3 text-center">{acc}</td>
+              <td className="p-3 text-center hidden md:table-cell">{ans}</td>
+            </tr>;
+          })}</tbody></table>
+        </div>
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
+          <h3 className="font-serif font-bold text-lg text-[#004030] dark:text-[#D8C3A5] mb-4">{t.analytics_form_title}</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">{t.analytics_group}</label>
+              <select value={studentInfo.group} onChange={e=>setStudentInfo({...studentInfo,group:e.target.value})} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200"><option value="">--</option>{t.group_options.map(g=><option key={g} value={g}>{g}</option>)}</select></div>
+            <div><label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">{t.analytics_dept}</label><input value={studentInfo.dept} onChange={e=>setStudentInfo({...studentInfo,dept:e.target.value})} placeholder={t.analytics_dept_ph} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200"/></div>
+            <div><label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">{t.analytics_id}</label><input value={studentInfo.id} onChange={e=>setStudentInfo({...studentInfo,id:e.target.value})} placeholder={t.analytics_id_ph} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200"/></div>
+            <div><label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">{t.analytics_name}</label><input value={studentInfo.name} onChange={e=>setStudentInfo({...studentInfo,name:e.target.value})} placeholder={t.analytics_name_ph} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200"/></div>
+          </div>
+          <button onClick={handleExportCSV} disabled={!canExport} className="mt-4 px-6 py-2.5 bg-[#004030] dark:bg-[#D8C3A5] text-white dark:text-[#004030] font-bold rounded-lg disabled:opacity-40 hover:bg-[#002b20] transition-colors text-sm">{canExport?t.analytics_export_csv:t.analytics_fill_required}</button>
+        </div>
+        {renderNavBottom()}
+      </div>
+    );
+  };
+
+  const renderContent = () => {
+    if(module===0) return (
+      <div className="space-y-8 text-base leading-relaxed text-slate-700 dark:text-slate-300 animate-fade-in">
+        <div className="bg-[#004030] dark:bg-slate-800 rounded-2xl p-6 sm:p-8 text-white">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#D8C3A5] mb-3">{lang==='zh'?'課程簡介':'Course Introduction'}</p>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-white mb-4">{t.m0_title}</h2>
+          <p className="text-[#D8C3A5]/90 text-base leading-relaxed">{t.m0_intro}</p>
+        </div>
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border-l-4 border-[#D8C3A5] shadow-sm">
+          <h3 className="text-xl font-bold font-serif text-[#004030] dark:text-[#D8C3A5] mb-3">{t.m0_why}</h3>
+          <p className="text-base">{t.m0_why_desc}</p>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {t.m0_stats.map((s,i)=>(
+            <div key={i} className="bg-white dark:bg-slate-800 rounded-xl p-5 text-center shadow-sm border border-slate-200 dark:border-slate-700">
+              <div className="text-2xl md:text-3xl font-black font-serif text-[#004030] dark:text-[#D8C3A5] mb-1">{s.val}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">{s.label}</div>
+            </div>
+          ))}
+        </div>
+        <div>
+          <h3 className="text-lg font-bold uppercase tracking-wider text-slate-500 mb-4">{lang==='zh'?'課程模組':'Course Modules'}</h3>
+          <div className="space-y-3">
+            {t.m0_modules.map((m,i)=>(
+              <button key={i} onClick={()=>setModule(i+1)} className="w-full flex items-center gap-5 bg-white dark:bg-slate-800 rounded-xl px-6 py-4 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-[#D8C3A5] transition-all text-left group">
+                <div className="text-3xl font-black font-serif text-[#D8C3A5] w-10 shrink-0">{m.num}</div>
+                <div className="flex-1 min-w-0"><div className="font-bold font-serif text-[#004030] dark:text-[#D8C3A5] mb-1">{m.title}</div><div className="text-sm text-slate-500">{m.desc}</div></div>
+                <IconChevronRight size={20} className="text-slate-300 group-hover:text-[#004030] dark:group-hover:text-[#D8C3A5] shrink-0 transition-colors"/>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="flex justify-end"><button onClick={()=>setModule(1)} className="px-8 py-3 bg-[#004030] dark:bg-[#D8C3A5] text-white dark:text-[#004030] font-serif font-bold hover:bg-[#002b20] dark:hover:bg-white transition-colors rounded-lg shadow-md">{t.m0_start}</button></div>
+      </div>
+    );
+    if(module>=1 && module<=N) return renderModule(module);
+    if(module===N+1) return renderResources();
+    if(module===N+2) return renderLab();
+    if(module===N+3) return renderAnalytics();
+  };
+
+  return (
+    <div className={`min-h-screen bg-[#f4f4f4] dark:bg-[#121212] font-sans selection:bg-[#004030] selection:text-white dark:selection:bg-[#D8C3A5] dark:selection:text-[#004030] flex flex-col overflow-x-hidden pt-16`}>
+      <header className="fixed top-0 left-0 right-0 h-16 bg-[#004030] dark:bg-slate-900 text-white z-50 shadow-lg border-b border-[#D8C3A5]/30">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="relative" ref={menuRef}>
+              <button className="p-2 hover:bg-white/10 rounded-lg transition-colors" onClick={()=>setMenuOpen(!menuOpen)} aria-label="Toggle menu">{menuOpen?<IconX size={20}/>:<IconMenu size={20}/>}</button>
+              {menuOpen && (
+                <div className="absolute top-full left-0 mt-1 w-64 max-w-[calc(100vw-2rem)] max-h-[calc(100vh-5rem)] overflow-y-auto bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 z-[100] overflow-x-hidden">
+                  <div className="bg-[#004030]/5 dark:bg-[#D8C3A5]/5 px-4 py-2 border-b border-slate-200 dark:border-slate-700"><p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t.nav_modules}</p></div>
+                  {modulesList.map(m=>(
+                    <button key={m.id} onClick={()=>{setModule(m.id);setMenuOpen(false);}} className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors text-left ${module===m.id?'bg-[#004030] text-white dark:bg-[#D8C3A5]/20 dark:text-[#D8C3A5] font-bold':'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}>
+                      <span className={module===m.id?'text-[#D8C3A5]':'opacity-50'}>{m.icon}</span><span className="truncate">{m.title}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <button onClick={()=>window.scrollTo({top:0,behavior:'smooth'})} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <div className="font-serif font-black text-lg tracking-widest text-[#D8C3A5]">ENT</div>
+              <div className="hidden sm:block text-left"><h1 className="font-serif font-bold text-sm md:text-base leading-tight">{t.title}</h1><p className="text-[10px] text-[#D8C3A5]/70">{t.subtitle}</p></div>
+            </button>
+          </div>
+          <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-1 mr-2">
+              {ttsState!=='playing'?<button onClick={()=>handleTTS('play')} title={t.audio_read} className="p-2 rounded-full hover:bg-white/10 transition-colors flex items-center space-x-1 text-xs"><IconPlay size={14}/><span className="hidden md:inline">{t.audio_read}</span></button>
+              :<button onClick={()=>handleTTS('pause')} className="p-2 rounded-full hover:bg-white/10 transition-colors"><IconPause size={14}/></button>}
+              {ttsState!=='idle'&&<button onClick={()=>handleTTS('stop')} className="p-2 rounded-full hover:bg-white/10 transition-colors"><IconSquare size={14}/></button>}
+            </div>
+            <button onClick={()=>{setLang(lang==='zh'?'en':'zh');window.speechSynthesis?.cancel();setTtsState('idle');}} className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-sm font-bold transition-colors">{lang==='zh'?'EN':'中文'}</button>
+            <button onClick={()=>setIsDark(!isDark)} className="p-2 rounded-full hover:bg-white/10 transition-colors">{isDark?<IconSun size={18}/>:<IconMoon size={18}/>}</button>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto w-full px-3 sm:px-4 lg:px-6 flex-1 flex flex-col md:flex-row gap-0 py-6">
+        <aside className="hidden md:block w-64 shrink-0 mr-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden sticky top-24">
+            <div className="bg-[#004030]/5 dark:bg-[#D8C3A5]/5 px-4 py-3 border-b border-slate-200 dark:border-slate-700"><p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t.nav_modules}</p></div>
+            <nav className="space-y-0.5 p-2 max-h-[calc(100vh-10rem)] overflow-y-auto">
+              {modulesList.map(m=>(
+                <button key={m.id} onClick={()=>{setModule(m.id);setMenuOpen(false);}} className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${module===m.id?'bg-[#004030] dark:bg-[#D8C3A5]/20 text-white dark:text-[#D8C3A5] border border-[#D8C3A5]/30':'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}>
+                  <span className={`mr-2.5 ${module===m.id?'text-[#D8C3A5]':'opacity-50'}`}>{m.icon}</span><span className="truncate">{m.title}</span>
+                  {module===m.id&&<IconChevronRight size={14} className="ml-auto opacity-50 shrink-0"/>}
+                </button>
+              ))}
+            </nav>
+          </div>
+        </aside>
+
+        <main ref={contentRef} className="flex-1 min-w-0" onClick={handleClick}>
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-6 md:p-8">{renderContent()}</div>
+        </main>
+      </div>
+
+      <footer className="bg-[#004030] dark:bg-slate-950 text-slate-300 dark:text-slate-400 border-t border-[#D8C3A5]">
+        <div className="max-w-7xl mx-auto px-4 h-8 flex justify-between items-center text-[10px] sm:text-xs">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <div className="font-serif font-black text-[#D8C3A5] hidden sm:block tracking-widest text-sm">ENT</div>
+            <span className="truncate">{t.copyright} · {t.date}</span>
+          </div>
+          <div className="flex items-center space-x-3 md:space-x-4">
+            <span className="text-[#D8C3A5]/70 font-serif hidden sm:inline">Architect:&nbsp;<a href={t.architect_url} target="_blank" rel="noopener noreferrer" className="text-[#D8C3A5] hover:text-white underline underline-offset-2 transition-colors">Prof. Shihmin Lo</a></span>
+            <button onClick={()=>window.scrollTo({top:0,behavior:'smooth'})} className="flex items-center uppercase tracking-widest hover:text-white transition-colors border-l border-slate-600 pl-3"><IconChevronUp size={12} className="md:mr-1"/><span className="hidden sm:inline">TOP</span></button>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
