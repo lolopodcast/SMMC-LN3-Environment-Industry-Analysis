@@ -77,9 +77,7 @@ const { useState, useEffect, useRef } = React;
 const EiaLogo = ({className=""}) => (
   <svg viewBox="0 0 66 40" className={`h-8 w-auto ${className}`} fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect width="66" height="40" rx="6" fill="#004030" />
-    <path d="M12 12H22V15H15V20H20V23H15V28H22V31H12V12Z" fill="#D8C3A5"/>
-    <path d="M30 12H34V31H30V12Z" fill="#D8C3A5"/>
-    <path d="M48 12L52 31H49L47.5 24H42.5L41 31H38L42 12H48ZM46.5 15L43.5 21H46.5V15Z" fill="#D8C3A5"/>
+    <text x="33" y="27" textAnchor="middle" fontFamily="Merriweather, serif" fontWeight="900" fontSize="20" fill="#D8C3A5" className="select-none">EIA</text>
   </svg>
 );
 // General Icons
@@ -122,32 +120,34 @@ const FiveForcesDiagram = ({lang}) => {
   const [active, setActive] = useState(null);
   const forces = [
     { id:'rivals', label: lang==='zh'?'既有競爭者對抗':'Industry Rivalry', x:50, y:50, color:'#004030', desc: lang==='zh'?'產業內現有廠商之間的競爭強度，受集中度、差異化、退出障礙等影響。':'Intensity of competition among existing firms, affected by concentration, differentiation, exit barriers.' },
-    { id:'entry', label: lang==='zh'?'新進入者威脅':'Threat of Entry', x:50, y:10, color:'#b45309', desc: lang==='zh'?'進入障礙高低決定新進者對產業獲利的威脅程度。':'Height of entry barriers determines the threat new entrants pose to profitability.' },
-    { id:'substitutes', label: lang==='zh'?'替代品威脅':'Substitutes', x:50, y:90, color:'#7c3aed', desc: lang==='zh'?'替代品的價格-效能比越高，越能限制產業的定價能力。':'Higher price-performance of substitutes constrains industry pricing power.' },
-    { id:'buyers', label: lang==='zh'?'買方議價力':'Buyer Power', x:90, y:50, color:'#0369a1', desc: lang==='zh'?'買方集中度越高、轉換成本越低，買方議價力越強。':'Higher buyer concentration and lower switching costs increase buyer power.' },
-    { id:'suppliers', label: lang==='zh'?'供應商議價力':'Supplier Power', x:10, y:50, color:'#be123c', desc: lang==='zh'?'供應商越集中、差異化越高，其議價力越強。':'More concentrated and differentiated suppliers have stronger bargaining power.' },
+    { id:'entry', label: lang==='zh'?'新進入者威脅':'Threat of Entry', x:50, y:18, color:'#b45309', desc: lang==='zh'?'進入障礙高低決定新進者對產業獲利的威脅程度。':'Height of entry barriers determines the threat new entrants pose to profitability.' },
+    { id:'substitutes', label: lang==='zh'?'替代品威脅':'Substitutes', x:50, y:82, color:'#7c3aed', desc: lang==='zh'?'替代品的價格-效能比越高，越能限制產業的定價能力。':'Higher price-performance of substitutes constrains industry pricing power.' },
+    { id:'buyers', label: lang==='zh'?'買方議價力':'Buyer Power', x:82, y:50, color:'#0369a1', desc: lang==='zh'?'買方集中度越高、轉換成本越低，買方議價力越強。':'Higher buyer concentration and lower switching costs increase buyer power.' },
+    { id:'suppliers', label: lang==='zh'?'供應商議價力':'Supplier Power', x:18, y:50, color:'#be123c', desc: lang==='zh'?'供應商越集中、差異化越高，其議價力越強。':'More concentrated and differentiated suppliers have stronger bargaining power.' },
   ];
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700 select-none">
       <h3 className="font-serif font-bold text-lg text-[#004030] dark:text-[#D8C3A5] mb-4">{lang==='zh'?'🔬 互動式五力分析圖':'🔬 Interactive Five Forces Diagram'}</h3>
       <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{lang==='zh'?'點擊各力量查看詳細說明':'Click each force to see details'}</p>
-      <div className="relative w-full" style={{paddingBottom:'70%'}}>
+      
+      <div className="max-w-xl mx-auto relative w-full bg-slate-50/50 dark:bg-slate-900/20 rounded-xl my-4" style={{paddingBottom:'60%'}}>
         {forces.map(f => (
           <button key={f.id} onClick={() => setActive(active===f.id?null:f.id)}
-            className={`absolute px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md border-2 ${active===f.id?'scale-110 ring-2 ring-offset-2 ring-[#D8C3A5]':'hover:scale-105'}`}
+            className={`absolute flex items-center justify-center p-1.5 sm:p-2 rounded-lg text-[10px] sm:text-xs font-bold transition-all shadow-md border-2 whitespace-normal break-words leading-tight w-20 sm:w-28 h-12 sm:h-14 ${active===f.id?'scale-110 ring-2 ring-offset-2 ring-[#D8C3A5] z-10':'hover:scale-105 z-0'}`}
             style={{left:`${f.x}%`, top:`${f.y}%`, transform:'translate(-50%,-50%)', backgroundColor: f.color, color:'white', borderColor: active===f.id?'#D8C3A5':f.color}}>
             {f.label}
           </button>
         ))}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 70">
-          <line x1="50" y1="18" x2="50" y2="38" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
-          <line x1="50" y1="58" x2="50" y2="55" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
-          <line x1="20" y1="35" x2="38" y2="35" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
-          <line x1="62" y1="35" x2="80" y2="35" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <line x1="50" y1="30" x2="50" y2="38" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
+          <line x1="50" y1="70" x2="50" y2="62" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
+          <line x1="30" y1="50" x2="38" y2="50" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
+          <line x1="70" y1="50" x2="62" y2="50" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
         </svg>
       </div>
-      {active && <div className="mt-4 p-4 bg-[#004030]/5 dark:bg-[#D8C3A5]/5 rounded-xl border border-[#004030]/20 dark:border-[#D8C3A5]/20 animate-fade-in">
-        <p className="text-sm text-slate-700 dark:text-slate-300">{forces.find(f=>f.id===active)?.desc}</p>
+      
+      {active && <div className="mt-4 p-4 bg-[#004030]/5 dark:bg-[#D8C3A5]/5 rounded-xl border border-[#004030]/20 dark:border-[#D8C3A5]/20 animate-fade-in min-h-[70px] flex items-center">
+        <p className="text-sm text-slate-700 dark:text-slate-300 w-full">{forces.find(f=>f.id===active)?.desc}</p>
       </div>}
     </div>
   );
@@ -551,17 +551,17 @@ const ModuleSVG = ({id, lang, isDark}) => {
       <div className="w-full overflow-hidden flex justify-center py-6 protected">
         <svg viewBox="0 0 600 200" className="w-full max-w-2xl h-auto" fill="none">
             {/* Safe Zone (Profits) */}
-            <rect x="350" y="50" width="200" height="100" rx="8" fill={isDark?'#004030':'#D8C3A5'} />
-            <text x="450" y="105" textAnchor="middle" fill={isDark?'white':'#004030'} fontWeight="bold" fontSize="18">{lang==='zh'?'產業超額利潤':'Industry Excess Profits'}</text>
+            <rect x="320" y="50" width="260" height="100" rx="8" fill={isDark?'#004030':'#D8C3A5'} />
+            <text x="450" y="105" textAnchor="middle" fill={isDark?'white':'#004030'} fontWeight="bold" fontSize={lang==='zh'?'18':'15'}>{lang==='zh'?'產業超額利潤':'Industry Excess Profits'}</text>
             
             {/* Barrier Wall */}
             <rect x="250" y="20" width="40" height="160" rx="4" fill={stroke} />
             <text x="270" y="195" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="14">{lang==='zh'?'進入障礙':'Entry Barriers'}</text>
 
             {/* Entrant Arrow blocked */}
-            <rect x="50" y="80" width="120" height="40" rx="8" fill={fillLight} stroke={stroke} strokeWidth="2"/>
-            <text x="110" y="105" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="14">{lang==='zh'?'潛在進入者':'Potential Entrants'}</text>
-            <path d="M170 100 L240 100" stroke="red" strokeWidth="4" markerEnd="url(#arrowRed)"/>
+            <rect x="20" y="75" width="160" height="50" rx="8" fill={fillLight} stroke={stroke} strokeWidth="2"/>
+            <text x="100" y="105" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="14">{lang==='zh'?'潛在進入者':'Potential Entrants'}</text>
+            <path d="M180 100 L240 100" stroke="red" strokeWidth="4" markerEnd="url(#arrowRed)"/>
             
             {/* Crash effect */}
             <path d="M230 80 L250 100 L230 120" stroke="red" strokeWidth="3" fill="none"/>
