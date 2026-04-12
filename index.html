@@ -73,12 +73,13 @@ img, svg.protected { user-select: none; -webkit-user-drag: none; }
 const { useState, useEffect, useRef } = React;
 
 /* ===== SVG Icons & Brand ===== */
+// Width compressed to 2/3 (viewBox from 100x40 to 66x40)
 const EiaLogo = ({className=""}) => (
-  <svg viewBox="0 0 100 40" className={`h-8 w-auto ${className}`} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="100" height="40" rx="6" fill="#004030" />
-    <path d="M20 12H35V15H24V20H32V23H24V28H35V31H20V12Z" fill="#D8C3A5"/>
-    <path d="M48 12H52V31H48V12Z" fill="#D8C3A5"/>
-    <path d="M72 12L78 31H74L72.5 25H65.5L64 31H60L66 12H72ZM69 15L66.5 22H71.5L69 15Z" fill="#D8C3A5"/>
+  <svg viewBox="0 0 66 40" className={`h-8 w-auto ${className}`} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="66" height="40" rx="6" fill="#004030" />
+    <path d="M12 12H22V15H15V20H20V23H15V28H22V31H12V12Z" fill="#D8C3A5"/>
+    <path d="M30 12H34V31H30V12Z" fill="#D8C3A5"/>
+    <path d="M48 12L52 31H49L47.5 24H42.5L41 31H38L42 12H48ZM46.5 15L43.5 21H46.5V15Z" fill="#D8C3A5"/>
   </svg>
 );
 // General Icons
@@ -103,6 +104,193 @@ const IconLayers = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/200
 const IconFlag = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>;
 const IconZap = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
 const IconZapLab = ({size=24,className=""}) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/><circle cx="18" cy="5" r="3"/></svg>;
+
+/* ===== LinkCard (For Resources) ===== */
+const LinkCard = ({label, url, desc}) => (
+  <a href={url} target="_blank" rel="noopener noreferrer"
+    className="block bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 hover:border-[#004030] dark:hover:border-[#D8C3A5] hover:shadow-md transition-all group select-none">
+    <div className="flex items-start justify-between gap-2 mb-2">
+      <span className="font-bold font-serif text-sm text-[#004030] dark:text-[#D8C3A5] group-hover:underline leading-snug">{label}</span>
+      <svg className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+    </div>
+    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{desc}</p>
+  </a>
+);
+
+/* ===== Lab Components ===== */
+const FiveForcesDiagram = ({lang}) => {
+  const [active, setActive] = useState(null);
+  const forces = [
+    { id:'rivals', label: lang==='zh'?'既有競爭者對抗':'Industry Rivalry', x:50, y:50, color:'#004030', desc: lang==='zh'?'產業內現有廠商之間的競爭強度，受集中度、差異化、退出障礙等影響。':'Intensity of competition among existing firms, affected by concentration, differentiation, exit barriers.' },
+    { id:'entry', label: lang==='zh'?'新進入者威脅':'Threat of Entry', x:50, y:10, color:'#b45309', desc: lang==='zh'?'進入障礙高低決定新進者對產業獲利的威脅程度。':'Height of entry barriers determines the threat new entrants pose to profitability.' },
+    { id:'substitutes', label: lang==='zh'?'替代品威脅':'Substitutes', x:50, y:90, color:'#7c3aed', desc: lang==='zh'?'替代品的價格-效能比越高，越能限制產業的定價能力。':'Higher price-performance of substitutes constrains industry pricing power.' },
+    { id:'buyers', label: lang==='zh'?'買方議價力':'Buyer Power', x:90, y:50, color:'#0369a1', desc: lang==='zh'?'買方集中度越高、轉換成本越低，買方議價力越強。':'Higher buyer concentration and lower switching costs increase buyer power.' },
+    { id:'suppliers', label: lang==='zh'?'供應商議價力':'Supplier Power', x:10, y:50, color:'#be123c', desc: lang==='zh'?'供應商越集中、差異化越高，其議價力越強。':'More concentrated and differentiated suppliers have stronger bargaining power.' },
+  ];
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700 select-none">
+      <h3 className="font-serif font-bold text-lg text-[#004030] dark:text-[#D8C3A5] mb-4">{lang==='zh'?'🔬 互動式五力分析圖':'🔬 Interactive Five Forces Diagram'}</h3>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{lang==='zh'?'點擊各力量查看詳細說明':'Click each force to see details'}</p>
+      <div className="relative w-full" style={{paddingBottom:'70%'}}>
+        {forces.map(f => (
+          <button key={f.id} onClick={() => setActive(active===f.id?null:f.id)}
+            className={`absolute px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md border-2 ${active===f.id?'scale-110 ring-2 ring-offset-2 ring-[#D8C3A5]':'hover:scale-105'}`}
+            style={{left:`${f.x}%`, top:`${f.y}%`, transform:'translate(-50%,-50%)', backgroundColor: f.color, color:'white', borderColor: active===f.id?'#D8C3A5':f.color}}>
+            {f.label}
+          </button>
+        ))}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 70">
+          <line x1="50" y1="18" x2="50" y2="38" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
+          <line x1="50" y1="58" x2="50" y2="55" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
+          <line x1="20" y1="35" x2="38" y2="35" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
+          <line x1="62" y1="35" x2="80" y2="35" stroke="#D8C3A5" strokeWidth="0.5" strokeDasharray="2"/>
+        </svg>
+      </div>
+      {active && <div className="mt-4 p-4 bg-[#004030]/5 dark:bg-[#D8C3A5]/5 rounded-xl border border-[#004030]/20 dark:border-[#D8C3A5]/20 animate-fade-in">
+        <p className="text-sm text-slate-700 dark:text-slate-300">{forces.find(f=>f.id===active)?.desc}</p>
+      </div>}
+    </div>
+  );
+};
+
+const HHICalculator = ({lang}) => {
+  const [shares, setShares] = useState([40, 30, 20, 10]);
+  const hhi = shares.reduce((sum, s) => sum + s*s, 0);
+  const cr4 = shares.reduce((sum, s) => sum + s, 0);
+  const getLevel = () => hhi < 1500 ? (lang==='zh'?'低度集中':'Low Concentration') : hhi < 2500 ? (lang==='zh'?'中度集中':'Moderate Concentration') : (lang==='zh'?'高度集中':'High Concentration');
+  const colors = ['#004030','#0369a1','#D8C3A5','#b45309'];
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700 select-none">
+      <h3 className="font-serif font-bold text-lg text-[#004030] dark:text-[#D8C3A5] mb-4">{lang==='zh'?'📊 HHI 集中度計算器':'📊 HHI Concentration Calculator'}</h3>
+      <div className="space-y-3 mb-4">
+        {shares.map((s,i) => (
+          <div key={i} className="flex items-center gap-3">
+            <span className="text-xs font-bold w-16 shrink-0" style={{color:colors[i]}}>{lang==='zh'?`廠商 ${i+1}`:`Firm ${i+1}`}</span>
+            <input type="range" min="0" max="100" value={s} onChange={e => { const n=[...shares]; n[i]=+e.target.value; setShares(n); }} className="flex-1 h-2 rounded-lg appearance-none cursor-pointer" style={{accentColor:colors[i]}}/>
+            <span className="text-sm font-mono w-10 text-right">{s}%</span>
+          </div>
+        ))}
+      </div>
+      <div className="flex items-center gap-1 mb-4">
+        {shares.map((s,i) => (
+          <div key={i} style={{width:`${s}%`, backgroundColor:colors[i], minWidth: s>0?'4px':'0'}} className="h-4 rounded transition-all duration-300"/>
+        ))}
+      </div>
+      <div className="grid grid-cols-3 gap-2 text-center">
+        <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-3">
+          <p className="text-lg font-black font-serif text-[#004030] dark:text-[#D8C3A5]">{hhi}</p>
+          <p className="text-xs text-slate-500">HHI</p>
+        </div>
+        <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-3">
+          <p className="text-lg font-black font-serif text-[#004030] dark:text-[#D8C3A5]">{cr4}%</p>
+          <p className="text-xs text-slate-500">CR4</p>
+        </div>
+        <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-3">
+          <p className="text-sm font-bold text-[#004030] dark:text-[#D8C3A5] mt-1">{getLevel()}</p>
+          <p className="text-xs text-slate-500 mt-1">{lang==='zh'?'集中程度':'Level'}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const BarrierSimulator = ({lang}) => {
+  const [capital, setCapital] = useState(3);
+  const [scale, setScale] = useState(3);
+  const [brand, setBrand] = useState(2);
+  const [regulation, setRegulation] = useState(4);
+  const avg = ((capital+scale+brand+regulation)/4).toFixed(1);
+  const items = [
+    { label: lang==='zh'?'資本需求':'Capital Req.', val: capital, set: setCapital, color:'#004030' },
+    { label: lang==='zh'?'規模經濟':'Scale Econ.', val: scale, set: setScale, color:'#0369a1' },
+    { label: lang==='zh'?'品牌忠誠':'Brand Loyalty', val: brand, set: setBrand, color:'#D8C3A5' },
+    { label: lang==='zh'?'法規障礙':'Regulation', val: regulation, set: setRegulation, color:'#b45309' },
+  ];
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700 select-none">
+      <h3 className="font-serif font-bold text-lg text-[#004030] dark:text-[#D8C3A5] mb-4">{lang==='zh'?'🏗️ 進入障礙模擬器':'🏗️ Entry Barrier Simulator'}</h3>
+      <div className="space-y-4 mb-5">
+        {items.map((it,i) => (
+          <div key={i}>
+            <div className="flex justify-between text-xs mb-1"><span className="font-bold text-slate-700 dark:text-slate-300">{it.label}</span><span className="text-slate-500">{it.val}/5</span></div>
+            <input type="range" min="1" max="5" value={it.val} onChange={e=>it.set(+e.target.value)} className="w-full h-2 rounded appearance-none cursor-pointer" style={{accentColor:it.color}}/>
+          </div>
+        ))}
+      </div>
+      <div className="text-center bg-[#004030]/5 dark:bg-[#D8C3A5]/5 rounded-xl p-4 border border-[#004030]/10 dark:border-[#D8C3A5]/10">
+        <p className="text-2xl font-black font-serif text-[#004030] dark:text-[#D8C3A5]">{avg}/5.0</p>
+        <p className="text-xs text-slate-500">{lang==='zh'?'綜合進入障礙高度':'Overall Entry Barrier Height'}</p>
+        <p className="text-sm mt-2 font-bold">{avg>=4?(lang==='zh'?'🔒 極高障礙':'🔒 Very High'):avg>=3?(lang==='zh'?'🔐 中高障礙':'🔐 Moderate-High'):avg>=2?(lang==='zh'?'🔓 中低障礙':'🔓 Moderate-Low'):(lang==='zh'?'🔓 低障礙':'🔓 Low')}</p>
+      </div>
+    </div>
+  );
+};
+
+const ProfitabilityChart = ({lang}) => {
+  const data = [
+    { name: lang==='zh'?'菸草':'Tobacco', roe: 36.2 },
+    { name: lang==='zh'?'家用品':'Household', roe: 27.0 },
+    { name: lang==='zh'?'製藥':'Pharma', roe: 20.5 },
+    { name: lang==='zh'?'食品服務':'Food Svc', roe: 21.7 },
+    { name: lang==='zh'?'半導體':'Semicon.', roe: 8.6 },
+    { name: lang==='zh'?'電信':'Telecom', roe: 7.0 },
+    { name: lang==='zh'?'汽車':'Autos', roe: 6.4 },
+    { name: lang==='zh'?'航空':'Airlines', roe: -7.1 },
+  ];
+  const max = 40;
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700 select-none">
+      <h3 className="font-serif font-bold text-lg text-[#004030] dark:text-[#D8C3A5] mb-4">{lang==='zh'?'📈 產業平均獲利率比較 (ROE%)':'📈 Avg. Industry Profitability (ROE%)'}</h3>
+      <div className="space-y-3">
+        {data.map((d,i) => (
+          <div key={i} className="flex items-center gap-3">
+            <span className="text-xs w-20 shrink-0 text-right font-medium text-slate-700 dark:text-slate-300">{d.name}</span>
+            <div className="flex-1 bg-slate-100 dark:bg-slate-700 rounded h-5 relative overflow-hidden">
+              <div className={`h-full rounded transition-all duration-500 ${d.roe>=0?'bg-[#004030] dark:bg-[#D8C3A5]':'bg-red-500'}`}
+                style={{width:`${Math.abs(d.roe)/max*100}%`, marginLeft: d.roe<0?'auto':'0', float: d.roe<0?'right':'left'}}/>
+            </div>
+            <span className="text-xs font-mono w-12 text-right text-slate-600 dark:text-slate-400">{d.roe}%</span>
+          </div>
+        ))}
+      </div>
+      <p className="text-xs text-slate-400 mt-4 text-right">{lang==='zh'?'資料來源：Fortune 500, 歷年分析':'Source: Fortune 500 Analytics'}</p>
+    </div>
+  );
+};
+
+const KSFAnalyzer = ({lang}) => {
+  const [industry, setIndustry] = useState(0);
+  const industries = [
+    { name: lang==='zh'?'鋼鐵業':'Steel', demand: lang==='zh'?'低價、品質一致、供應穩定':'Low price, consistency, reliable supply', competition: lang==='zh'?'低產品差異化、高固定成本、退出障礙高 → 激烈價格戰':'Undifferentiated, high fixed costs, high exit barriers → fierce price war', ksf: lang==='zh'?'成本效率（大規模廠房）、強健財務實力':'Cost efficiency (large-scale plants), financial strength' },
+    { name: lang==='zh'?'時尚服飾':'Fashion', demand: lang==='zh'?'多元偏好、願付品牌溢價':'Diverse preferences, willingness to pay brand premium', competition: lang==='zh'?'低進入障礙、買方力量強 → 快速模仿與淘汰':'Low entry barriers, strong buyer power → rapid imitation', ksf: lang==='zh'?'差異化與低成本結合、快速回應流行趨勢':'Differentiation + low cost, speed of response to trends' },
+    { name: lang==='zh'?'超市量販':'Supermarket', demand: lang==='zh'?'低價、便利位置、產品齊全':'Low prices, convenient location, wide range', competition: lang==='zh'?'取決於競爭者距離、買方議價力及低毛利體質':'Depends on proximity, buyer bargaining power, thin margins', ksf: lang==='zh'?'極致營運效率、大量採購議價力、在地化策略':'Operational efficiency, purchasing scale, localization' },
+  ];
+  const ind = industries[industry];
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700 select-none">
+      <h3 className="font-serif font-bold text-lg text-[#004030] dark:text-[#D8C3A5] mb-4">{lang==='zh'?'🎯 關鍵成功因素 (KSF) 辨識工具':'🎯 KSF Identification Tool'}</h3>
+      <div className="flex gap-2 mb-5 flex-wrap">
+        {industries.map((ind,i) => (
+          <button key={i} onClick={()=>setIndustry(i)} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${industry===i?'bg-[#004030] text-white dark:bg-[#D8C3A5] dark:text-[#004030] shadow-md':'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'}`}>{ind.name}</button>
+        ))}
+      </div>
+      <div className="space-y-4">
+        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30">
+            <p className="text-xs font-bold text-blue-800 dark:text-blue-300 mb-1 flex items-center gap-2"><IconActivity size={14}/> {lang==='zh'?'顧客需求 (Demand)':'Customer Demand'}</p>
+            <p className="text-sm text-slate-700 dark:text-slate-300">{ind.demand}</p>
+        </div>
+        <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-xl border border-orange-100 dark:border-orange-800/30">
+            <p className="text-xs font-bold text-orange-800 dark:text-orange-300 mb-1 flex items-center gap-2"><IconFlag size={14}/> {lang==='zh'?'競爭存活 (Competition)':'Competition Survival'}</p>
+            <p className="text-sm text-slate-700 dark:text-slate-300">{ind.competition}</p>
+        </div>
+        <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800/50">
+            <p className="text-xs font-bold text-green-800 dark:text-green-300 mb-1 flex items-center gap-2"><IconCheckCircle size={14}/> {lang==='zh'?'關鍵成功因素 (KSFs)':'Key Success Factors'}</p>
+            <p className="text-sm font-bold text-green-900 dark:text-green-100">{ind.ksf}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 /* ===== Interactive Engines (Cards & Quizzes) ===== */
 
@@ -263,7 +451,37 @@ const QuizContainer = ({ questions, t, moduleId, onQuizTrack }) => {
 const ModuleSVG = ({id, lang, isDark}) => {
     const stroke = isDark ? "#D8C3A5" : "#004030";
     const fillLight = isDark ? "#1e293b" : "#f8fafc";
+    const accent = isDark ? "#475569" : "#e2e8f0";
     
+    // Module 0: Overall Architecture
+    if (id===0) return (
+      <div className="w-full overflow-hidden flex justify-center py-6 protected">
+        <svg viewBox="0 0 600 280" className="w-full max-w-2xl h-auto" fill="none">
+            {/* Top Level: Macro */}
+            <rect x="50" y="20" width="500" height="60" rx="8" fill={fillLight} stroke={stroke} strokeWidth="2" strokeDasharray="4 4"/>
+            <text x="300" y="55" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="16">{lang==='zh'?'總體環境掃描 (PESTEL)':'Macro Environment Scanning (PESTEL)'}</text>
+            
+            {/* Arrow down */}
+            <path d="M300 80 L300 110" stroke={stroke} strokeWidth="2" markerEnd="url(#arrow)"/>
+            
+            {/* Middle Level: Industry */}
+            <rect x="150" y="115" width="300" height="70" rx="8" fill={isDark?'#004030':'#D8C3A5'} />
+            <text x="300" y="145" textAnchor="middle" fill={isDark?'white':'#004030'} fontWeight="bold" fontSize="16">{lang==='zh'?'產業結構分析':'Industry Structure Analysis'}</text>
+            <text x="300" y="165" textAnchor="middle" fill={isDark?'#D8C3A5':'#004030'} fontSize="12">{lang==='zh'?'(SCP 典範 & 五力分析)':'(SCP Paradigm & Five Forces)'}</text>
+
+            {/* Arrow down */}
+            <path d="M300 185 L300 215" stroke={stroke} strokeWidth="2" markerEnd="url(#arrow)"/>
+
+            {/* Bottom Level: Strategy & KSF */}
+            <rect x="100" y="220" width="400" height="50" rx="8" fill={accent} stroke={stroke} strokeWidth="2"/>
+            <text x="300" y="250" textAnchor="middle" fill={isDark?'white':'#004030'} fontWeight="bold" fontSize="16">{lang==='zh'?'企業定位策略與關鍵成功因素 (KSF)':'Firm Positioning Strategy & KSF'}</text>
+
+            <defs><marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill={stroke}/></marker></defs>
+        </svg>
+      </div>
+    );
+
+    // Module 1: PESTEL -> Industry
     if (id===1) return (
       <div className="w-full overflow-hidden flex justify-center py-6 protected">
         <svg viewBox="0 0 600 250" className="w-full max-w-2xl h-auto" fill="none">
@@ -273,10 +491,11 @@ const ModuleSVG = ({id, lang, isDark}) => {
             <text x="300" y="145" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="14">{lang==='zh'?'產業環境':'Industry Env.'}</text>
             <text x="300" y="165" textAnchor="middle" fill={stroke} fontSize="12">{lang==='zh'?'(顧客, 供應商, 競爭者)':'(Customers, Suppliers, Rivals)'}</text>
             <path d="M300 60 L300 75" stroke={stroke} strokeWidth="2" markerEnd="url(#arrow)"/>
-            <defs><marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill={stroke}/></marker></defs>
         </svg>
       </div>
     );
+
+    // Module 2: SCP
     if (id===2) return (
       <div className="w-full overflow-hidden flex justify-center py-6 protected">
         <svg viewBox="0 0 600 150" className="w-full max-w-3xl h-auto" fill="none">
@@ -295,33 +514,113 @@ const ModuleSVG = ({id, lang, isDark}) => {
         </svg>
       </div>
     );
-    // Standard placeholder for others for brevity, applied with same style
-    return (
+
+    // Module 3: Five Forces
+    if (id===3) return (
       <div className="w-full overflow-hidden flex justify-center py-6 protected">
-        <svg viewBox="0 0 600 200" className="w-full max-w-2xl h-auto" fill="none">
-            <rect x="10" y="10" width="580" height="180" rx="10" fill={fillLight} stroke={stroke} strokeWidth="2"/>
-            <text x="300" y="105" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="20">{lang==='zh'?`單元 ${id} 概念圖解`:`Module ${id} Concept Diagram`}</text>
+        <svg viewBox="0 0 600 350" className="w-full max-w-2xl h-auto" fill="none">
+            {/* Center: Rivalry */}
+            <rect x="200" y="140" width="200" height="70" rx="8" fill={isDark?'#004030':'#D8C3A5'} />
+            <text x="300" y="175" textAnchor="middle" fill={isDark?'white':'#004030'} fontWeight="bold" fontSize="16">{lang==='zh'?'既有競爭者對抗':'Industry Rivalry'}</text>
+            
+            {/* Top: Entrants */}
+            <rect x="220" y="20" width="160" height="50" rx="8" fill={fillLight} stroke={stroke} strokeWidth="2"/>
+            <text x="300" y="50" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="14">{lang==='zh'?'潛在進入者威脅':'Threat of Entrants'}</text>
+            <path d="M300 70 L300 135" stroke={stroke} strokeWidth="2" markerEnd="url(#arrow)"/>
+
+            {/* Bottom: Substitutes */}
+            <rect x="220" y="280" width="160" height="50" rx="8" fill={fillLight} stroke={stroke} strokeWidth="2"/>
+            <text x="300" y="310" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="14">{lang==='zh'?'替代品威脅':'Threat of Substitutes'}</text>
+            <path d="M300 280 L300 215" stroke={stroke} strokeWidth="2" markerEnd="url(#arrow)"/>
+
+            {/* Left: Suppliers */}
+            <rect x="20" y="150" width="130" height="50" rx="8" fill={fillLight} stroke={stroke} strokeWidth="2"/>
+            <text x="85" y="180" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="14">{lang==='zh'?'供應商議價力':'Supplier Power'}</text>
+            <path d="M150 175 L195 175" stroke={stroke} strokeWidth="2" markerEnd="url(#arrow)"/>
+
+            {/* Right: Buyers */}
+            <rect x="450" y="150" width="130" height="50" rx="8" fill={fillLight} stroke={stroke} strokeWidth="2"/>
+            <text x="515" y="180" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="14">{lang==='zh'?'買方議價力':'Buyer Power'}</text>
+            <path d="M450 175 L405 175" stroke={stroke} strokeWidth="2" markerEnd="url(#arrow)"/>
         </svg>
       </div>
     );
-};
 
-/* ===== External Components (Labs) ===== */
-const LabsPlaceholder = ({lang}) => (
-  <div className="p-8 text-center bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 select-none">
-    <IconZapLab size={48} className="mx-auto text-[#004030] dark:text-[#D8C3A5] mb-4 opacity-50"/>
-    <h3 className="font-serif text-xl font-bold text-slate-600 dark:text-slate-300 mb-2">{lang==='zh'?'互動實驗室載入中...':'Interactive Labs Loading...'}</h3>
-    <p className="text-sm text-slate-500">{lang==='zh'?'包含五力分析圖、HHI計算器、進入障礙模擬與獲利拆解。':'Includes Five Forces, HHI Calculator, Barrier Simulator & Profitability.'}</p>
-  </div>
-);
+    // Module 4: Entry Barriers
+    if (id===4) return (
+      <div className="w-full overflow-hidden flex justify-center py-6 protected">
+        <svg viewBox="0 0 600 200" className="w-full max-w-2xl h-auto" fill="none">
+            {/* Safe Zone (Profits) */}
+            <rect x="350" y="50" width="200" height="100" rx="8" fill={isDark?'#004030':'#D8C3A5'} />
+            <text x="450" y="105" textAnchor="middle" fill={isDark?'white':'#004030'} fontWeight="bold" fontSize="18">{lang==='zh'?'產業超額利潤':'Industry Excess Profits'}</text>
+            
+            {/* Barrier Wall */}
+            <rect x="250" y="20" width="40" height="160" rx="4" fill={stroke} />
+            <text x="270" y="195" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="14">{lang==='zh'?'進入障礙':'Entry Barriers'}</text>
+
+            {/* Entrant Arrow blocked */}
+            <rect x="50" y="80" width="120" height="40" rx="8" fill={fillLight} stroke={stroke} strokeWidth="2"/>
+            <text x="110" y="105" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="14">{lang==='zh'?'潛在進入者':'Potential Entrants'}</text>
+            <path d="M170 100 L240 100" stroke="red" strokeWidth="4" markerEnd="url(#arrowRed)"/>
+            
+            {/* Crash effect */}
+            <path d="M230 80 L250 100 L230 120" stroke="red" strokeWidth="3" fill="none"/>
+
+            <defs><marker id="arrowRed" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="red"/></marker></defs>
+        </svg>
+      </div>
+    );
+
+    // Module 5: Positioning & Bottleneck
+    if (id===5) return (
+      <div className="w-full overflow-hidden flex justify-center py-6 protected">
+        <svg viewBox="0 0 600 200" className="w-full max-w-2xl h-auto" fill="none">
+            <text x="300" y="30" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="16">{lang==='zh'?'重塑價值鏈與掌握瓶頸':'Reshaping Value Chain & Bottlenecks'}</text>
+            
+            <rect x="50" y="80" width="120" height="60" rx="8" fill={fillLight} stroke={stroke} strokeWidth="2"/>
+            <text x="110" y="115" textAnchor="middle" fill={stroke} fontSize="14">{lang==='zh'?'研發設計':'R&D Design'}</text>
+
+            <path d="M170 110 L210 110" stroke={stroke} strokeWidth="2" markerEnd="url(#arrow)"/>
+
+            {/* Bottleneck highlighted */}
+            <rect x="220" y="70" width="160" height="80" rx="8" fill={isDark?'#004030':'#D8C3A5'} stroke="gold" strokeWidth="3"/>
+            <text x="300" y="105" textAnchor="middle" fill={isDark?'white':'#004030'} fontWeight="bold" fontSize="16">{lang==='zh'?'稀缺瓶頸':'Scarce Bottleneck'}</text>
+            <text x="300" y="125" textAnchor="middle" fill={isDark?'#D8C3A5':'#004030'} fontSize="12">{lang==='zh'?'(利潤匯集處)':'(Profit Pool)'}</text>
+
+            <path d="M380 110 L420 110" stroke={stroke} strokeWidth="2" markerEnd="url(#arrow)"/>
+
+            <rect x="430" y="80" width="120" height="60" rx="8" fill={fillLight} stroke={stroke} strokeWidth="2"/>
+            <text x="490" y="115" textAnchor="middle" fill={stroke} fontSize="14">{lang==='zh'?'終端銷售':'Retail Sales'}</text>
+        </svg>
+      </div>
+    );
+
+    // Module 6: KSF
+    if (id===6) return (
+      <div className="w-full overflow-hidden flex justify-center py-6 protected">
+        <svg viewBox="0 0 600 250" className="w-full max-w-2xl h-auto" fill="none">
+            <circle cx="230" cy="125" r="100" fill={isDark?'#0369a1':'#bae6fd'} fillOpacity="0.4" stroke="#0369a1" strokeWidth="2"/>
+            <text x="180" y="130" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="16">{lang==='zh'?'顧客需求':'Customer Demand'}</text>
+            
+            <circle cx="370" cy="125" r="100" fill={isDark?'#b45309':'#fef08a'} fillOpacity="0.4" stroke="#b45309" strokeWidth="2"/>
+            <text x="420" y="130" textAnchor="middle" fill={stroke} fontWeight="bold" fontSize="16">{lang==='zh'?'競爭存活':'Competition Survival'}</text>
+
+            <text x="300" y="120" textAnchor="middle" fill={isDark?'white':'#004030'} fontWeight="bold" fontSize="20">KSF</text>
+            <text x="300" y="140" textAnchor="middle" fill={isDark?'white':'#004030'} fontSize="12">{lang==='zh'?'關鍵成功因素':'Key Success Factors'}</text>
+        </svg>
+      </div>
+    );
+
+    return null;
+};
 
 /* ===== Content Dictionary (Expanded for 0412 Spec) ===== */
 const N = 6;
-const TOTAL = 1 + N + 3; // M0 + M1-M6 + Resources + Lab + Analytics
+const TOTAL = 1 + N + 2 + 1; // M0 + M1-M6 + Labs + Resources + Analytics = 10 modules (0 to 9)
 
 const dict = {
 zh: {
-title:"產業分析：外部環境與產業結構", subtitle:"SMMC · 互動學習系列",
+title:"EIA | 產業分析：外部環境與產業結構", subtitle:"SMMC · 互動學習系列",
 nav_modules:"單元目錄", nav_prev:"上一單元", nav_next:"下一單元",
 key_terms:"關鍵學習卡", flip_prompt:"點擊翻轉", audio_read:"語音導覽",
 cards_random:"隨機抽取 2 張", next_batch:"下一組",
@@ -343,14 +642,16 @@ analytics_overall_acc:"總體測驗答對率",
 analytics_module:"模組", analytics_time:"停留時間",
 analytics_clicks:"點擊次數", analytics_acc:"答對率",
 analytics_cards_rate:"卡片翻閱率", analytics_correct_ans_total:"答對/已答",
-analytics_no_data:"--", analytics_sec:"s", analytics_times:"x",
+analytics_no_data:"--", analytics_sec:"s", analytics_times:"次",
+analytics_weak_title:"弱點分析與建議", analytics_weak_perfect:"目前尚無足夠數據，或您已完美掌握所有單元！請繼續保持。",
+analytics_weak_detect:"系統偵測到您在「{module}」的測驗表現有待加強 ({acc}%)。建議您重新仔細閱讀該單元的深潛內容與關鍵學習卡。",
 
 m0_nav:"0. 執行概要",
 m0_title:"產業分析的基礎與實踐",
 m0_intro:"本課程以 Grant 教科書第三章為核心，系統性地探討產業環境分析的理論工具與實務應用。從總體環境聚焦到產業層級，掌握 Porter 五力分析、SCP 典範與產業結構理論，學習如何預測產業獲利趨勢並制定競爭策略。",
 m0_why:"為什麼產業分析重要？",
 m0_why_desc:"Warren Buffett 曾說：「當聲譽卓著的管理團隊遇上基本面不佳的產業，保持完好的是產業的聲譽。」產業結構決定了競爭強度與獲利水準，是策略分析的核心起點。理解產業分析，就是掌握利潤的源頭。",
-m0_stats:[{ val:"5", label:"大競爭力量" }, { val:"6", label:"學習模組" }, { val:"48+", label:"雙語題庫" }, { val:"4", label:"互動實驗" }],
+m0_stats:[{ val:"5", label:"大競爭力量" }, { val:"6", label:"學習模組" }, { val:"48+", label:"雙語題庫" }, { val:"4+", label:"互動實驗" }],
 m0_modules:[
   { num:"01", title:"從總體環境到產業分析", desc:"PESTEL 掃描與產業邊界界定" },
   { num:"02", title:"產業結構的經濟學基礎", desc:"SCP 典範與集中度指標" },
@@ -361,7 +662,7 @@ m0_modules:[
 ],
 m0_start:"開始學習 →",
 
-// Modules 1-6 Data Structure (Expanded)
+// Modules 1-6
 m1_nav:"1. 環境與邊界",
 m1_title:"從總體環境到產業分析",
 m1_overview:"本單元探討如何從廣泛的外部總體環境，聚焦至直接影響企業績效的核心產業環境。",
@@ -385,7 +686,7 @@ m1_q:[
   { q:"產業(Industry)與市場(Market)的主要差異為何？", opts:["兩者完全相同","產業以生產端為視角，市場以消費端為視角","產業限於製造業","市場僅限實體交易"], ans:1, exp:"產業聚焦於供給產品的廠商集合；市場則聚焦於消費者的需求區隔。" }
 ],
 
-m2_nav:"2. 結構經濟學",
+m2_nav:"2. 產業組織經濟學",
 m2_title:"產業結構的經濟學基礎",
 m2_overview:"介紹產業組織經濟學(IO)的核心架構，理解市場集中度如何影響廠商行為與獲利。",
 m2_highlights:"SCP 典範、市場結構光譜、寡占、HHI 指數。",
@@ -433,7 +734,6 @@ m3_q:[
 
 m4_nav:"4. 進入與對抗",
 m4_title:"進入障礙與產業對抗",
-m4_p1:"", // Ignored, handled by new structure
 m4_overview:"聚焦於產業防禦機制的建立，探討進入障礙、退出障礙與成本結構的動態影響。",
 m4_highlights:"規模經濟、絕對成本優勢、沉沒成本、退出障礙。",
 m4_deepdive:[
@@ -501,14 +801,13 @@ m6_q:[
   { q:"關於 KSF，下列哪項敘述是正確的？", opts:["同一個產業內，所有獲利企業必定採取完全相同的策略來達成 KSF","KSF 會隨時間與產業結構變遷而改變","尋找 KSF 只能依靠直覺，無法系統化分析","KSF 指的是企業內部的專利數量"], ans:1, exp:"顧客需求與競爭態勢會改變，因此產業的關鍵成功因素也會隨之動態演化。" }
 ],
 
-// Module 7, 8, 9 Nav
 m7_nav:"7. 互動實驗室",
 m7_title:"互動實驗室",
 m7_desc:"透過互動工具深化對產業分析概念的理解。您可以使用這些工具建立實務直覺。",
 
 m8_nav:"8. 學習資源",
 m8_title:"外部學習資源",
-m8_desc:"精選的產業分析相關學術資源與延伸閱讀，幫助您深化理論基礎。",
+m8_desc:"精選的產業分析相關學術資源、影音教材與延伸閱讀，幫助您深化理論基礎。",
 
 date:"Version 2026.04.12",
 copyright:"For Educational Use Only",
@@ -540,13 +839,15 @@ analytics_module:"Module", analytics_time:"Time Spent",
 analytics_clicks:"Clicks", analytics_acc:"Accuracy",
 analytics_cards_rate:"Card View Rate", analytics_correct_ans_total:"Correct / Ans",
 analytics_no_data:"--", analytics_sec:"s", analytics_times:"x",
+analytics_weak_title:"Weakness Analysis & Recommendations", analytics_weak_perfect:"No sufficient data yet, or you've mastered everything perfectly! Keep it up.",
+analytics_weak_detect:"The system detected a lower accuracy ({acc}%) in '{module}'. We highly recommend reviewing its Deep Dive and FlipCards again.",
 
 m0_nav:"0. Exec Summary",
 m0_title:"Foundations & Practice of Industry Analysis",
 m0_intro:"Based on Grant's Chapter 3, this course systematically explores the theoretical tools and practical applications of industry environment analysis. Master Porter's Five Forces, the SCP paradigm, and industry structure theory to forecast profitability and develop competitive strategies.",
 m0_why:"Why Does Industry Analysis Matter?",
 m0_why_desc:"Warren Buffett once said: 'When a management with a reputation for brilliance tackles a business with a reputation for poor fundamental economics, it is the reputation of the business that remains intact.' Industry structure determines competitive intensity and profitability—it is the starting point of strategy analysis.",
-m0_stats:[{ val:"5", label:"Forces" }, { val:"6", label:"Modules" }, { val:"48+", label:"Bilingual Qs" }, { val:"4", label:"Labs" }],
+m0_stats:[{ val:"5", label:"Forces" }, { val:"6", label:"Modules" }, { val:"48+", label:"Bilingual Qs" }, { val:"4+", label:"Labs" }],
 m0_modules:[
   { num:"01", title:"From Macro Environment to Industry", desc:"PESTEL scanning & industry boundary definition" },
   { num:"02", title:"Economic Foundations of Structure", desc:"SCP paradigm & concentration metrics" },
@@ -557,6 +858,7 @@ m0_modules:[
 ],
 m0_start:"Start Learning →",
 
+// Modules 1-6
 m1_nav:"1. Env & Boundaries",
 m1_title:"From Macro Environment to Industry Analysis",
 m1_overview:"Explores how to focus from the broad macro environment to the core industry environment that directly impacts firm performance.",
@@ -580,7 +882,7 @@ m1_q:[
   { q:"What distinguishes an 'Industry' from a 'Market'?", opts:["They are identical","Industry takes a production view, Market takes a consumption view","Industry is only manufacturing","Market is only physical"], ans:1, exp:"Industry focuses on supplying firms; Market focuses on consumer segments." }
 ],
 
-m2_nav:"2. Structural Econ",
+m2_nav:"2. Industrial Organization",
 m2_title:"Economic Foundations of Industry Structure",
 m2_overview:"Introduces Industrial Organization (IO) economics, understanding how concentration affects conduct and profits.",
 m2_highlights:"SCP Paradigm, Market Structure Spectrum, Oligopoly, HHI.",
@@ -695,13 +997,13 @@ m6_q:[
   { q:"Which statement about KSFs is correct?", opts:["All profitable firms in an industry must adopt identical strategies to meet KSFs","KSFs evolve dynamically with time and structural shifts","Finding KSFs relies solely on intuition, not systematic analysis","KSFs refer strictly to a firm's patent count"], ans:1, exp:"As customer needs and competitive dynamics shift, industry KSFs evolve accordingly." }
 ],
 
-m7_nav:"7. Interactive Labs",
-m7_title:"Interactive Laboratory",
-m7_desc:"Deepen your understanding of industry analysis concepts through interactive tools. Build practical intuition here.",
+m7_nav:"7. 互動實驗室",
+m7_title:"互動實驗室",
+m7_desc:"透過互動工具深化對產業分析概念的理解。您可以使用這些工具建立實務直覺。",
 
-m8_nav:"8. Resources",
-m8_title:"External Learning Resources",
-m8_desc:"Curated academic materials and extended readings to solidify your theoretical foundation.",
+m8_nav:"8. 學習資源",
+m8_title:"外部學習資源",
+m8_desc:"精選的產業分析相關學術資源、影音教材與延伸閱讀，幫助您深化理論基礎。",
 
 date:"Version 2026.04.12",
 copyright:"For Educational Use Only",
@@ -791,14 +1093,35 @@ function App() {
       window.speechSynthesis.cancel();
       const sep=lang==='zh'?'。 ':'. ';
       let texts=[];
-      if(module===0){texts=[t.m0_title,t.m0_intro,t.m0_why,t.m0_why_desc,...(t.m0_stats||[]).map(s=>`${s.label}: ${s.val}`),...(t.m0_modules||[]).map(m=>`${m.title}. ${m.desc}`)].filter(Boolean);}
+      if(module===0){
+        // Ensure to include the summary of the homepage SVG diagram in the read text
+        const m0_diagram = lang==='zh' ? "全網頁架構包含：總體環境掃描、產業結構分析、以及企業定位策略與關鍵成功因素。" : "The framework covers Macro Environment Scanning, Industry Structure Analysis, and Firm Positioning Strategy & KSF.";
+        texts=[t.m0_title, t.m0_intro, m0_diagram, t.m0_why, t.m0_why_desc,...(t.m0_stats||[]).map(s=>`${s.label}: ${s.val}`),...(t.m0_modules||[]).map(m=>`${m.title}. ${m.desc}`)].filter(Boolean);
+      }
       else if(module>=1&&module<=N){
         const mk=`m${module}`;
         texts=[t[`${mk}_title`], t[`${mk}_overview`], t[`${mk}_highlights`], ...(t[`${mk}_deepdive`]||[]), t[`${mk}_wrapup`]].filter(Boolean);
       }
       else if(module===N+1){texts=[t.m7_title,t.m7_desc].filter(Boolean);}
       else if(module===N+2){texts=[t.m8_title,t.m8_desc].filter(Boolean);}
-      else{texts=[t.analytics_title,t.analytics_desc].filter(Boolean);}
+      else{
+        // Add Weakness recommendation to TTS
+        let weakText = "";
+        let lowestAcc = 1;
+        let weakModule = -1;
+        for(let i=1; i<=N; i++){
+          if(analytics.quizTotal[i]>0) {
+            const acc = analytics.quizCorrect[i]/analytics.quizTotal[i];
+            if(acc < lowestAcc) { lowestAcc = acc; weakModule = i; }
+          }
+        }
+        if(weakModule !== -1 && lowestAcc < 1) {
+            weakText = t.analytics_weak_detect.replace('{module}', t[`m${weakModule}_nav`]).replace('{acc}', Math.round(lowestAcc*100));
+        } else {
+            weakText = t.analytics_weak_perfect;
+        }
+        texts=[t.analytics_title, t.analytics_desc, t.analytics_weak_title, weakText].filter(Boolean);
+      }
       
       const text=texts.join(sep);
       const u=new SpeechSynthesisUtterance(text); u.rate=0.95;
@@ -910,6 +1233,16 @@ function App() {
     const totalAnswered = analytics.quizTotal.reduce((a,b)=>a+b,0);
     const overallAcc = totalAnswered>0?Math.round(totalCorrect/totalAnswered*100)+'%':t.analytics_no_data;
     
+    // Weakness Detection
+    let lowestAcc = 1;
+    let weakModule = -1;
+    for(let i=1; i<=N; i++) {
+        if(analytics.quizTotal[i] > 0) {
+            const acc = analytics.quizCorrect[i] / analytics.quizTotal[i];
+            if(acc < lowestAcc) { lowestAcc = acc; weakModule = i; }
+        }
+    }
+
     // Validation
     const canExport = studentInfo.group && studentInfo.id && studentInfo.name;
     const mNavKeys = Array.from({length:N},(_,i)=>`m${i+1}_nav`);
@@ -933,6 +1266,18 @@ function App() {
               <p className="text-xs text-slate-500 mt-1">{s.label}</p>
             </div>
           ))}
+        </div>
+        
+        {/* WEAKNESS ANALYSIS (Added 0412 Specs) */}
+        <div className="bg-red-50 dark:bg-red-900/10 border-l-4 border-red-500 rounded-r-xl p-5 mb-6 shadow-sm">
+            <h3 className="font-bold text-red-800 dark:text-red-400 mb-2 flex items-center gap-2"><IconTrendingUp size={18}/> {t.analytics_weak_title}</h3>
+            {weakModule !== -1 && lowestAcc < 1 ? (
+                <p className="text-sm text-red-700 dark:text-red-300">
+                    {t.analytics_weak_detect.replace('{module}', t[`m${weakModule}_nav`]).replace('{acc}', Math.round(lowestAcc*100))}
+                </p>
+            ) : (
+                <p className="text-sm text-green-700 dark:text-green-400">{t.analytics_weak_perfect}</p>
+            )}
         </div>
 
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-x-auto shadow-sm">
@@ -986,6 +1331,10 @@ function App() {
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-white mb-4 relative z-10">{t.m0_title}</h2>
           <p className="text-[#D8C3A5]/90 text-base leading-relaxed relative z-10 max-w-3xl">{t.m0_intro}</p>
         </div>
+        
+        {/* Added: Overall SVG diagram for entire website */}
+        <ModuleSVG id={0} lang={lang} isDark={isDark} />
+
         <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border-l-4 border-[#D8C3A5] shadow-sm">
           <h3 className="text-xl font-bold font-serif text-[#004030] dark:text-[#D8C3A5] mb-3">{t.m0_why}</h3>
           <p className="text-base">{t.m0_why_desc}</p>
@@ -1014,8 +1363,63 @@ function App() {
       </div>
     );
     if(module>=1 && module<=N) return renderModule(module);
-    if(module===N+1) return <div className="animate-fade-in"><h2 className="text-3xl font-serif font-black text-[#004030] dark:text-[#D8C3A5] border-b-2 border-[#D8C3A5] pb-4 mb-6">{t.m7_title}</h2><p className="mb-6">{t.m7_desc}</p><LabsPlaceholder lang={lang}/>{renderNavBottom()}</div>;
-    if(module===N+2) return <div className="animate-fade-in"><h2 className="text-3xl font-serif font-black text-[#004030] dark:text-[#D8C3A5] border-b-2 border-[#D8C3A5] pb-4 mb-6">{t.m8_title}</h2><p className="mb-6">{t.m8_desc}</p>{renderNavBottom()}</div>;
+    
+    // Module 7: Interactive Labs
+    if(module===N+1) return (
+      <div className="animate-fade-in space-y-8">
+        <h2 className="text-3xl font-serif font-black text-[#004030] dark:text-[#D8C3A5] border-b-2 border-[#D8C3A5] pb-4 select-none">{t.m7_title}</h2>
+        <p className="mb-6 select-none">{t.m7_desc}</p>
+        <FiveForcesDiagram lang={lang}/>
+        <div className="grid md:grid-cols-2 gap-6">
+          <HHICalculator lang={lang}/>
+          <BarrierSimulator lang={lang}/>
+        </div>
+        <ProfitabilityChart lang={lang}/>
+        <KSFAnalyzer lang={lang}/>
+        {renderNavBottom()}
+      </div>
+    );
+
+    // Module 8: Learning Resources
+    if(module===N+2) {
+      const links = [
+        { label: lang==='zh'?'Porter 五力分析原始論文 (HBR)':'Porter Five Forces Original Paper (HBR)', url:'https://hbr.org/2008/01/the-five-competitive-forces-that-shape-strategy', desc: lang==='zh'?'Michael Porter 2008 年更新版，完整闡述五力分析的理論與應用。':'Michael Porter\'s 2008 updated article on the Five Forces framework.' },
+        { label: lang==='zh'?'Grant: Contemporary Strategy Analysis':'Grant: Contemporary Strategy Analysis', url:'https://www.wiley.com/en-us/Contemporary+Strategy+Analysis-p-9781119815235', desc: lang==='zh'?'本課程主要教科書，第三章為產業分析基礎。':'Main textbook for this course; Chapter 3 covers industry analysis fundamentals.' },
+      ];
+      const other = [
+        { icon:'🎬', cat: lang==='zh'?'影音教材':'Video Materials', items:[
+          { label: lang==='zh'?'Harvard Business School: Five Forces Explained':'HBS: Five Forces Explained', url:'https://www.youtube.com/watch?v=mYF2_FBCvXw', desc: lang==='zh'?'Porter 本人講解五力分析的經典影片。':'Porter himself explains the Five Forces framework.' },
+          { label: lang==='zh'?'台積電商業模式解析 (YouTube)':'TSMC Business Model Analysis', url:'https://www.youtube.com/results?search_query=TSMC+business+model+analysis', desc: lang==='zh'?'多部深度分析台積電護城河與產業結構的影片。':'Videos analyzing TSMC\'s moat and industry structure.' },
+        ]},
+        { icon:'📊', cat: lang==='zh'?'產業報告':'Industry Reports', items:[
+          { label: lang==='zh'?'PwC 電信業策略報告':'PwC Telecom Strategy Report', url:'https://www.pwc.tw/zh/publications/global-insights/strategic-choices-telecom-industry.html', desc: lang==='zh'?'PwC Strategy& 關於電信業結構轉變與策略選擇的深度分析。':'PwC Strategy& deep analysis on telecom structural transformation.' },
+          { label: lang==='zh'?'Deloitte 電信業資料分析應用':'Deloitte Telecom Data Analytics', url:'https://www2.deloitte.com/tw/tc/pages/risk/articles/newsletter-05-20.html', desc: lang==='zh'?'探討電信業如何運用資料分析因應產業結構變化。':'How telecom leverages data analytics amid structural changes.' },
+        ]},
+        { icon:'📚', cat: lang==='zh'?'學術資源':'Academic Resources', items:[
+          { label: lang==='zh'?'維基百科：五力分析':'Wikipedia: Five Forces', url:'https://zh.wikipedia.org/zh-tw/%E4%BA%94%E5%8A%9B%E5%88%86%E6%9E%90', desc: lang==='zh'?'五力分析的完整介紹與各力量指標說明。':'Complete overview of Five Forces with indicator descriptions.' },
+          { label: lang==='zh'?'台灣產業經濟服務網 (IEK)':'Taiwan IEK Industrial Economics', url:'https://www.moeaidb.gov.tw/', desc: lang==='zh'?'經濟部工業局產業資訊，提供台灣各產業結構數據。':'MOEA industrial data providing Taiwan industry structure statistics.' },
+        ]},
+      ];
+      return (
+        <div className="animate-fade-in space-y-8 select-none">
+          <h2 className="text-3xl font-serif font-black text-[#004030] dark:text-[#D8C3A5] border-b-2 border-[#D8C3A5] pb-4 mb-6">{t.m8_title}</h2>
+          <p className="mb-6">{t.m8_desc}</p>
+          <div className="grid md:grid-cols-2 gap-4">{links.map((l,i)=><LinkCard key={i} {...l}/>)}</div>
+          {other.map((sec,si)=>(
+            <div key={si} className="mt-8">
+              <h3 className="flex items-center gap-2 text-base font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide mb-4"><span>{sec.icon}</span>{sec.cat}</h3>
+              <div className="grid md:grid-cols-2 gap-4">{sec.items.map((l,i)=><LinkCard key={i} {...l}/>)}</div>
+            </div>
+          ))}
+          <div className="bg-[#004030]/5 dark:bg-[#D8C3A5]/5 rounded-xl p-5 mt-8 border border-[#004030]/20 dark:border-[#D8C3A5]/20">
+            <p className="text-sm text-slate-600 dark:text-slate-400">⚠️ {lang==='zh'?'以上連結僅供學術參考，內容版權歸原作者所有。連結有效性可能因時間而異。':'Links are for academic reference only. Content copyrights belong to original authors. Link validity may change over time.'}</p>
+          </div>
+          {renderNavBottom()}
+        </div>
+      );
+    }
+    
+    // Module 9: Analytics
     if(module===N+3) return renderAnalytics();
   };
 
